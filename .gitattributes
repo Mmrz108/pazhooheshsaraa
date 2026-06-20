@@ -1,0 +1,4 @@
+# Ensure shell scripts use LF on all platforms (required for Liara Linux containers)
+*.sh text eol=lf
+liara_pre_start.sh text eol=lf
+entrypoint.sh text eol=lf

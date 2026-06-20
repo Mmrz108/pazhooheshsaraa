@@ -1,11 +1,11 @@
 {
-  "platform": "docker",
+  "platform": "django",
   "app": "pazhooheshsaraa",
   "port": 8000,
-  "disks": [
-    {
-      "name": "media",
-      "mountTo": "/app/media"
-    }
-  ]
+  "django": {
+    "pythonVersion": "3.12",
+    "collectStatic": true,
+    "compileMessages": false,
+    "timezone": "Asia/Tehran"
+  }
 }
