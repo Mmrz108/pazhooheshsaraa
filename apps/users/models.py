@@ -74,3 +74,31 @@ class User(AbstractBaseUser, PermissionsMixin):
     @property
     def full_name(self):
         return f'{self.first_name} {self.last_name}'
+
+
+class OTPChallenge(models.Model):
+    mobile = models.CharField('شماره موبایل', max_length=11, unique=True, db_index=True)
+    code = models.CharField('کد OTP', max_length=6)
+    attempts = models.PositiveSmallIntegerField('تعداد تلاش', default=0)
+    expires_at = models.DateTimeField('انقضای کد')
+    verified_at = models.DateTimeField('زمان تأیید', null=True, blank=True)
+    send_count = models.PositiveSmallIntegerField('تعداد ارسال', default=1)
+    send_window_started = models.DateTimeField('شروع پنجره ارسال', default=timezone.now)
+    last_sent_at = models.DateTimeField('آخرین ارسال', default=timezone.now)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'چالش OTP'
+        verbose_name_plural = 'چالش‌های OTP'
+
+    def __str__(self):
+        return self.mobile
+
+    @property
+    def is_expired(self):
+        return timezone.now() >= self.expires_at
+
+    @property
+    def is_verified(self):
+        return self.verified_at is not None

@@ -317,6 +317,8 @@ const AuthModal = (() => {
   }
 
   async function sendOtp() {
+    if (sendingOtp) return;
+
     const v = toEn($('#auth-phone')?.value || '').replace(/\D/g, '');
     if (v.length !== 11 || !v.startsWith('09')) {
       autoSendDone = false;
@@ -329,12 +331,11 @@ const AuthModal = (() => {
       toast('لطفاً قوانین و مقررات را بپذیرید', 'error');
       return;
     }
-    if (sendingOtp) return;
 
+    sendingOtp = true;
     mobile = v;
     sessionStorage.setItem('auth_mobile', mobile);
     const btn = $('#auth-send-btn');
-    sendingOtp = true;
     setLoading(btn, true, 'در حال ارسال...');
     try {
       const data = await apiFetch('/auth/send-otp/', {

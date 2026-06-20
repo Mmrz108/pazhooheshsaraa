@@ -1,14 +1,13 @@
-import json
 import logging
 import random
 import re
 import string
-import time
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.core.cache import cache
+from django.utils import timezone
 
+from apps.users.models import OTPChallenge
 from common.validators import normalize_digits, normalize_mobile, validate_iranian_mobile, validate_iranian_national_code
 
 User = get_user_model()
@@ -23,10 +22,6 @@ class OTPError(Exception):
 
 
 class OTPService:
-    OTP_PREFIX = 'otp:auth:'
-    RATE_PREFIX = 'otp:rate:'
-    SEND_COUNT_PREFIX = 'otp:send_count:'
-    VERIFIED_PREFIX = 'otp:verified:'
     REGISTRATION_TTL = 600
 
     def __init__(self):
@@ -34,18 +29,6 @@ class OTPService:
         self.max_attempts = settings.OTP_MAX_ATTEMPTS
         self.resend_cooldown = settings.OTP_RESEND_COOLDOWN_SECONDS
         self.max_sends_per_hour = settings.OTP_MAX_SENDS_PER_HOUR
-
-    def _otp_key(self, mobile: str) -> str:
-        return f'{self.OTP_PREFIX}{mobile}'
-
-    def _rate_key(self, mobile: str) -> str:
-        return f'{self.RATE_PREFIX}{mobile}'
-
-    def _send_count_key(self, mobile: str) -> str:
-        return f'{self.SEND_COUNT_PREFIX}{mobile}'
-
-    def _verified_key(self, mobile: str) -> str:
-        return f'{self.VERIFIED_PREFIX}{mobile}'
 
     def _generate_code(self) -> str:
         return ''.join(random.choices(string.digits, k=6))
@@ -58,13 +41,17 @@ class OTPService:
         normalized = re.sub(r'\D', '', normalized)
         return normalized
 
-    def _get_resend_cooldown(self, mobile: str) -> int:
-        expires_at = cache.get(self._rate_key(mobile))
-        if not expires_at:
-            return 0
-        return max(0, int(expires_at) - int(time.time()))
+    def _get_challenge(self, mobile: str) -> OTPChallenge | None:
+        return OTPChallenge.objects.filter(mobile=mobile).first()
 
-    def _check_rate_limits(self, mobile: str, is_resend: bool = False):
+    def _get_resend_cooldown(self, mobile: str) -> int:
+        challenge = self._get_challenge(mobile)
+        if not challenge or not challenge.last_sent_at:
+            return 0
+        remaining = int((challenge.last_sent_at + timezone.timedelta(seconds=self.resend_cooldown) - timezone.now()).total_seconds())
+        return max(0, remaining)
+
+    def _check_rate_limits(self, mobile: str, challenge: OTPChallenge | None, is_resend: bool = False):
         if is_resend:
             cooldown = self._get_resend_cooldown(mobile)
             if cooldown > 0:
@@ -73,8 +60,11 @@ class OTPService:
                     code='resend_cooldown',
                 )
 
-        send_count = cache.get(self._send_count_key(mobile)) or 0
-        if int(send_count) >= self.max_sends_per_hour:
+        if not challenge:
+            return
+
+        window_age = timezone.now() - challenge.send_window_started
+        if window_age.total_seconds() < 3600 and challenge.send_count >= self.max_sends_per_hour:
             raise OTPError(
                 'تعداد درخواست‌های OTP بیش از حد مجاز است. یک ساعت دیگر تلاش کنید.',
                 code='rate_limit_exceeded',
@@ -84,27 +74,36 @@ class OTPService:
         mobile = normalize_mobile(mobile)
         validate_iranian_mobile(mobile)
 
-        existing = cache.get(self._otp_key(mobile))
-        is_resend = existing is not None
-        self._check_rate_limits(mobile, is_resend=is_resend)
+        challenge = self._get_challenge(mobile)
+        is_resend = challenge is not None and not challenge.is_verified
+        self._check_rate_limits(mobile, challenge, is_resend=is_resend)
 
         code = self._generate_code()
-        data = {
-            'code': code,
-            'mobile': mobile,
-            'attempts': 0,
-            'is_existing_user': User.objects.filter(mobile=mobile).exists(),
-        }
+        now = timezone.now()
+        expires_at = now + timezone.timedelta(seconds=self.expiry)
 
-        cache.set(self._otp_key(mobile), json.dumps(data), timeout=self.expiry)
-        cache.set(
-            self._rate_key(mobile),
-            int(time.time()) + self.resend_cooldown,
-            timeout=self.resend_cooldown,
+        if challenge and (now - challenge.send_window_started).total_seconds() >= 3600:
+            send_count = 1
+            send_window_started = now
+        elif challenge:
+            send_count = challenge.send_count + 1
+            send_window_started = challenge.send_window_started
+        else:
+            send_count = 1
+            send_window_started = now
+
+        OTPChallenge.objects.update_or_create(
+            mobile=mobile,
+            defaults={
+                'code': code,
+                'attempts': 0,
+                'expires_at': expires_at,
+                'verified_at': None,
+                'send_count': send_count,
+                'send_window_started': send_window_started,
+                'last_sent_at': now,
+            },
         )
-
-        send_count = cache.get(self._send_count_key(mobile)) or 0
-        cache.set(self._send_count_key(mobile), int(send_count) + 1, timeout=3600)
 
         from apps.users.services.otp_delivery import OTPDeliveryError, send_otp_code
 
@@ -112,7 +111,7 @@ class OTPService:
             'mobile': mobile,
             'expires_in': self.expiry,
             'resend_cooldown': self.resend_cooldown,
-            'is_existing_user': data['is_existing_user'],
+            'is_existing_user': User.objects.filter(mobile=mobile).exists(),
             'message': 'کد تأیید ارسال شد.',
         }
 
@@ -130,11 +129,13 @@ class OTPService:
                 return result
             raise OTPError(exc.message, code=exc.code) from exc
 
+        logger.info('OTP stored in DB for %s, expires %s', mobile, expires_at.isoformat())
         return result
 
     def resend_otp(self, mobile: str) -> dict:
         mobile = normalize_mobile(mobile)
-        if not cache.get(self._otp_key(mobile)):
+        challenge = self._get_challenge(mobile)
+        if not challenge or challenge.is_verified:
             raise OTPError(
                 'درخواست یافت نشد. لطفاً مجدداً شماره موبایل را وارد کنید.',
                 code='not_found',
@@ -143,37 +144,49 @@ class OTPService:
 
     def verify_otp(self, mobile: str, code: str) -> dict:
         mobile = normalize_mobile(mobile)
-        raw = cache.get(self._otp_key(mobile))
-        if not raw:
+        challenge = self._get_challenge(mobile)
+        if not challenge:
+            logger.warning('OTP verify failed: no challenge for %s', mobile)
             raise OTPError(
                 'کد تأیید منقضی شده است. لطفاً مجدداً درخواست دهید.',
                 code='expired',
             )
 
-        data = json.loads(raw)
-        data['attempts'] = data.get('attempts', 0) + 1
+        if challenge.is_expired:
+            challenge.delete()
+            logger.warning('OTP verify failed: expired for %s', mobile)
+            raise OTPError(
+                'کد تأیید منقضی شده است. لطفاً مجدداً درخواست دهید.',
+                code='expired',
+            )
 
-        if data['attempts'] > self.max_attempts:
-            cache.delete(self._otp_key(mobile))
+        challenge.attempts += 1
+
+        if challenge.attempts > self.max_attempts:
+            challenge.delete()
             raise OTPError(
                 'تعداد تلاش‌های ناموفق بیش از حد مجاز است.',
                 code='max_attempts',
             )
 
-        if self._normalize_code(data['code']) != self._normalize_code(code):
-            cache.set(self._otp_key(mobile), json.dumps(data), timeout=self.expiry)
+        if self._normalize_code(challenge.code) != self._normalize_code(code):
+            challenge.save(update_fields=['attempts', 'updated_at'])
             raise OTPError('کد تأیید نادرست است.', code='invalid_code')
-
-        cache.delete(self._otp_key(mobile))
 
         user = User.objects.filter(mobile=mobile).first()
         if user:
             if not user.is_active:
                 raise OTPError('حساب کاربری غیرفعال است.', code='inactive_user')
+            challenge.delete()
             return {'action': 'login', 'user': user}
 
-        cache.set(self._verified_key(mobile), True, timeout=self.REGISTRATION_TTL)
+        challenge.verified_at = timezone.now()
+        challenge.code = ''
+        challenge.save(update_fields=['verified_at', 'code', 'updated_at'])
         return {'action': 'register', 'mobile': mobile}
+
+    def _registration_deadline(self, challenge: OTPChallenge):
+        return challenge.verified_at + timezone.timedelta(seconds=self.REGISTRATION_TTL)
 
     def complete_registration(
         self,
@@ -189,14 +202,22 @@ class OTPService:
         national_code = normalize_digits(national_code)
         validate_iranian_national_code(national_code)
 
-        if not cache.get(self._verified_key(mobile)):
+        challenge = self._get_challenge(mobile)
+        if not challenge or not challenge.is_verified or not challenge.verified_at:
             raise OTPError(
                 'ابتدا کد تأیید را وارد کنید یا مجدداً درخواست دهید.',
                 code='not_verified',
             )
 
+        if timezone.now() >= self._registration_deadline(challenge):
+            challenge.delete()
+            raise OTPError(
+                'مهلت تکمیل ثبت‌نام تمام شده است. لطفاً دوباره کد تأیید بگیرید.',
+                code='registration_expired',
+            )
+
         if User.objects.filter(mobile=mobile).exists():
-            cache.delete(self._verified_key(mobile))
+            challenge.delete()
             raise OTPError('این شماره موبایل قبلاً ثبت شده است.', code='mobile_exists')
 
         if User.objects.filter(national_code=national_code).exists():
@@ -210,5 +231,5 @@ class OTPService:
             father_name=father_name.strip(),
             birth_date=birth_date,
         )
-        cache.delete(self._verified_key(mobile))
+        challenge.delete()
         return user
