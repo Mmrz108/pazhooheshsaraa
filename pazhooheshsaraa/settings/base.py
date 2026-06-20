@@ -19,21 +19,38 @@ env = environ.Env(
 
 environ.Env.read_env(BASE_DIR / '.env')
 
+
+def _env_or(*keys, default=''):
+    """Read env var from Liara/system; skip empty strings."""
+    for key in keys:
+        value = os.getenv(key)
+        if value not in (None, ''):
+            return value
+    return default
+
+
 SECRET_KEY = env('SECRET_KEY', default='django-insecure-dev-key-change-in-production')
 DEBUG = env('DEBUG')
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
 
-_liara_app = os.getenv('LIARA_APP_NAME', '')
+_liara_app = os.getenv('LIARA_APP_NAME', '') or _env_or('LIARA_APP')
+_liara_url = os.getenv('LIARA_APP_URL', '') or os.getenv('LIARA_URL', '')
 if _liara_app and f'{_liara_app}.liara.run' not in ALLOWED_HOSTS:
     ALLOWED_HOSTS.append(f'{_liara_app}.liara.run')
 if '.liara.run' not in ALLOWED_HOSTS:
     ALLOWED_HOSTS.append('.liara.run')
+if _liara_url and _liara_url not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append(_liara_url)
 
 CSRF_TRUSTED_ORIGINS = env.list('CSRF_TRUSTED_ORIGINS', default=[])
 if _liara_app:
     _liara_origin = f'https://{_liara_app}.liara.run'
     if _liara_origin not in CSRF_TRUSTED_ORIGINS:
         CSRF_TRUSTED_ORIGINS.append(_liara_origin)
+if _liara_url:
+    _custom_origin = _liara_url if _liara_url.startswith('http') else f'https://{_liara_url}'
+    if _custom_origin not in CSRF_TRUSTED_ORIGINS:
+        CSRF_TRUSTED_ORIGINS.append(_custom_origin)
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -91,11 +108,11 @@ ASGI_APPLICATION = 'pazhooheshsaraa.asgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env('POSTGRESQL_DB_NAME', default=env('DB_NAME', default='pazhooheshsaraa')),
-        'USER': env('POSTGRESQL_DB_USER', default=env('DB_USER', default='postgres')),
-        'PASSWORD': env('POSTGRESQL_DB_PASS', default=env('DB_PASSWORD', default='postgres')),
-        'HOST': env('POSTGRESQL_DB_HOST', default=env('DB_HOST', default='localhost')),
-        'PORT': env('POSTGRESQL_DB_PORT', default=env('DB_PORT', default='5432')),
+        'NAME': _env_or('POSTGRESQL_DB_NAME', 'DB_NAME', default='pazhooheshsaraa'),
+        'USER': _env_or('POSTGRESQL_DB_USER', 'DB_USER', default='postgres'),
+        'PASSWORD': _env_or('POSTGRESQL_DB_PASS', 'DB_PASSWORD', default='postgres'),
+        'HOST': _env_or('POSTGRESQL_DB_HOST', 'DB_HOST', default='localhost'),
+        'PORT': _env_or('POSTGRESQL_DB_PORT', 'DB_PORT', default='5432'),
     }
 }
 
@@ -140,8 +157,8 @@ if USE_REDIS:
 else:
     CACHES = {
         'default': {
-            'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-            'LOCATION': BASE_DIR / 'cache',
+            'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+            'LOCATION': 'app_cache_table',
         }
     }
 
@@ -229,7 +246,11 @@ ZARINPAL_MERCHANT_ID = env('ZARINPAL_MERCHANT_ID', default='')
 ZARINPAL_SANDBOX = env('ZARINPAL_SANDBOX')
 PAYMENT_CALLBACK_URL = env(
     'PAYMENT_CALLBACK_URL',
-    default='http://localhost:8000/api/payments/verify/',
+    default=(
+        f'https://{_liara_app}.liara.run/api/payments/verify/'
+        if _liara_app and not DEBUG
+        else 'http://localhost:8000/api/payments/verify/'
+    ),
 )
 
 # Celery
