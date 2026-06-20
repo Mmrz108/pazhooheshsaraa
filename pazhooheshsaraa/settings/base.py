@@ -29,12 +29,32 @@ def _env_or(*keys, default=''):
     return default
 
 
+def _database_from_url(url):
+    from urllib.parse import unquote, urlparse
+
+    parsed = urlparse(url)
+    return {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': unquote(parsed.path.lstrip('/') or 'postgres'),
+        'USER': unquote(parsed.username or ''),
+        'PASSWORD': unquote(parsed.password or ''),
+        'HOST': parsed.hostname or '',
+        'PORT': str(parsed.port or 5432),
+    }
+
+
 SECRET_KEY = env('SECRET_KEY', default='django-insecure-dev-key-change-in-production')
 DEBUG = env('DEBUG')
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
 
 _liara_app = os.getenv('LIARA_APP_NAME', '') or _env_or('LIARA_APP')
-_on_liara = bool(_liara_app or os.getenv('LIARA_APP_URL') or os.getenv('LIARA_URL'))
+_on_liara = bool(
+    _liara_app
+    or os.getenv('LIARA_APP_URL')
+    or os.getenv('LIARA_URL')
+    or os.getenv('LIARA')
+    or str(BASE_DIR).startswith('/usr/src/app')
+)
 _liara_url = os.getenv('LIARA_APP_URL', '') or os.getenv('LIARA_URL', '')
 if _liara_app and f'{_liara_app}.liara.run' not in ALLOWED_HOSTS:
     ALLOWED_HOSTS.append(f'{_liara_app}.liara.run')
@@ -117,8 +137,24 @@ DATABASES = {
     }
 }
 
+_database_url = _env_or('DATABASE_URL', 'POSTGRESQL_URI', 'POSTGRES_URI')
+if _database_url:
+    DATABASES['default'] = _database_from_url(_database_url)
+
+if _on_liara or not DEBUG:
+    _db = DATABASES['default']
+    if not _database_url and _db.get('HOST') in ('', 'localhost', '127.0.0.1'):
+        DATABASES['default'] = {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': _env_or('POSTGRESQL_DB_NAME', 'DB_NAME'),
+            'USER': _env_or('POSTGRESQL_DB_USER', 'DB_USER'),
+            'PASSWORD': _env_or('POSTGRESQL_DB_PASS', 'DB_PASSWORD'),
+            'HOST': _env_or('POSTGRESQL_DB_HOST', 'DB_HOST'),
+            'PORT': _env_or('POSTGRESQL_DB_PORT', 'DB_PORT', default='5432'),
+        }
+
 _use_sqlite = env.bool('USE_SQLITE', default=False)
-if _on_liara:
+if _on_liara or not DEBUG:
     _use_sqlite = False
 
 if _use_sqlite:
@@ -128,16 +164,8 @@ if _use_sqlite:
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
-elif _on_liara:
-    _pg_host = DATABASES['default']['HOST']
-    _pg_name = DATABASES['default']['NAME']
-    if not _pg_host or _pg_host in ('localhost', '127.0.0.1') or not _pg_name:
-        from django.core.exceptions import ImproperlyConfigured
-
-        raise ImproperlyConfigured(
-            'روی Liara باید PostgreSQL تنظیم شود. USE_SQLITE=False بگذارید و '
-            'متغیرهای POSTGRESQL_DB_HOST/PORT/USER/PASS/NAME را در پنل لیارا وارد کنید.'
-        )
+# PostgreSQL env vars are validated at runtime in liara_pre_start.sh (not here),
+# because Liara runs collectstatic at build time without runtime env vars.
 
 AUTH_USER_MODEL = 'users.User'
 

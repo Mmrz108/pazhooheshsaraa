@@ -6,6 +6,7 @@
     "pythonVersion": "3.12",
     "collectStatic": true,
     "compileMessages": false,
+    "modifySettings": false,
     "timezone": "Asia/Tehran"
   }
 }
