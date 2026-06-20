@@ -1,4 +1,4 @@
-﻿import logging
+import logging
 import re
 
 from django.conf import settings
