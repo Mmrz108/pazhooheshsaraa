@@ -23,6 +23,18 @@ SECRET_KEY = env('SECRET_KEY', default='django-insecure-dev-key-change-in-produc
 DEBUG = env('DEBUG')
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
 
+_liara_app = os.getenv('LIARA_APP_NAME', '')
+if _liara_app and f'{_liara_app}.liara.run' not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append(f'{_liara_app}.liara.run')
+if '.liara.run' not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append('.liara.run')
+
+CSRF_TRUSTED_ORIGINS = env.list('CSRF_TRUSTED_ORIGINS', default=[])
+if _liara_app:
+    _liara_origin = f'https://{_liara_app}.liara.run'
+    if _liara_origin not in CSRF_TRUSTED_ORIGINS:
+        CSRF_TRUSTED_ORIGINS.append(_liara_origin)
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -45,6 +57,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -78,11 +91,11 @@ ASGI_APPLICATION = 'pazhooheshsaraa.asgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env('DB_NAME', default='pazhooheshsaraa'),
-        'USER': env('DB_USER', default='postgres'),
-        'PASSWORD': env('DB_PASSWORD', default='postgres'),
-        'HOST': env('DB_HOST', default='localhost'),
-        'PORT': env('DB_PORT', default='5432'),
+        'NAME': env('POSTGRESQL_DB_NAME', default=env('DB_NAME', default='pazhooheshsaraa')),
+        'USER': env('POSTGRESQL_DB_USER', default=env('DB_USER', default='postgres')),
+        'PASSWORD': env('POSTGRESQL_DB_PASS', default=env('DB_PASSWORD', default='postgres')),
+        'HOST': env('POSTGRESQL_DB_HOST', default=env('DB_HOST', default='localhost')),
+        'PORT': env('POSTGRESQL_DB_PORT', default=env('DB_PORT', default='5432')),
     }
 }
 
@@ -115,7 +128,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Redis
 REDIS_URL = env('REDIS_URL', default='redis://localhost:6379/0')
-USE_REDIS = env.bool('USE_REDIS', default=True)
+USE_REDIS = env.bool('USE_REDIS', default=False)
 
 if USE_REDIS:
     CACHES = {
@@ -233,4 +246,5 @@ if not DEBUG:
     X_FRAME_OPTIONS = 'DENY'
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
