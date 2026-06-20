@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مدیریت وبسایت | پژوهش‌سرا</title>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Vazirmatn', sans-serif;
+    background: #F8FAFC;
+    color: #0F172A;
+    min-height: 100svh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.25rem;
+    direction: rtl;
+  }
+  .card {
+    width: 100%;
+    max-width: 420px;
+    background: #fff;
+    border: 1.5px solid #E2E8F0;
+    border-radius: 16px;
+    padding: 1.75rem;
+    box-shadow: 0 12px 40px rgba(15, 23, 42, 0.06);
+  }
+  h1 { font-size: 1.35rem; font-weight: 800; margin-bottom: 0.5rem; }
+  p { color: #64748B; font-size: 0.9rem; line-height: 1.8; margin-bottom: 1.25rem; }
+  label { display: block; font-size: 0.82rem; font-weight: 600; margin-bottom: 0.45rem; }
+  input {
+    width: 100%;
+    border: 1.5px solid #E2E8F0;
+    border-radius: 10px;
+    padding: 0.75rem 0.9rem;
+    font-family: inherit;
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+  }
+  input:focus { outline: none; border-color: #2563EB; }
+  .btn {
+    width: 100%;
+    border: none;
+    border-radius: 10px;
+    padding: 0.85rem 1rem;
+    font-family: inherit;
+    font-size: 0.92rem;
+    font-weight: 700;
+    cursor: pointer;
+    background: linear-gradient(135deg, #2563EB, #7C3AED);
+    color: #fff;
+  }
+  .btn:disabled { opacity: 0.65; cursor: not-allowed; }
+  .error {
+    display: none;
+    background: #FEF2F2;
+    color: #B91C1C;
+    border: 1px solid #FECACA;
+    border-radius: 10px;
+    padding: 0.75rem 0.9rem;
+    font-size: 0.82rem;
+    margin-bottom: 1rem;
+  }
+  .error.show { display: block; }
+  .back { display: inline-block; margin-top: 1rem; color: #2563EB; text-decoration: none; font-size: 0.85rem; font-weight: 600; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>مدیریت وبسایت</h1>
+    <p>برای ورود به پنل مدیریت، رمز مدیریت وبسایت را وارد کنید. این بخش فقط برای مدیران است.</p>
+    <div class="error" id="mgmt-error" role="alert"></div>
+    <form id="mgmt-form">
+      <label for="mgmt-password">رمز مدیریت وبسایت</label>
+      <input type="password" id="mgmt-password" autocomplete="current-password" required>
+      <button type="submit" class="btn" id="mgmt-submit">ورود به پنل مدیریت</button>
+    </form>
+    <a href="/" class="back">بازگشت به صفحه اصلی</a>
+  </div>
+
+<script src="/js/api.js"></script>
+<script>
+(async function () {
+  const params = new URLSearchParams(window.location.search);
+  const nextUrl = params.get('next') || '/admin/';
+  const errorEl = document.getElementById('mgmt-error');
+  const form = document.getElementById('mgmt-form');
+  const submitBtn = document.getElementById('mgmt-submit');
+
+  function showError(msg) {
+    errorEl.textContent = msg;
+    errorEl.classList.add('show');
+  }
+
+  if (!localStorage.getItem('access_token')) {
+    window.location.href = '/?auth=1';
+    return;
+  }
+
+  try {
+    const profile = await apiFetch('/dashboard/profile/');
+    if (!profile.is_staff) {
+      showError('شما دسترسی مدیریت وبسایت ندارید.');
+      form.hidden = true;
+      return;
+    }
+  } catch {
+    showError('ابتدا وارد حساب کاربری شوید.');
+    setTimeout(() => { window.location.href = '/?auth=1'; }, 1200);
+    return;
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errorEl.classList.remove('show');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'در حال بررسی...';
+
+    try {
+      const result = await apiFetch('/auth/admin-access/', {
+        method: 'POST',
+        credentials: 'include',
+        body: JSON.stringify({
+          password: document.getElementById('mgmt-password').value,
+          next: nextUrl,
+        }),
+      });
+      window.location.href = result.redirect_url || '/admin/';
+    } catch (err) {
+      showError(err.detail || 'رمز نادرست است یا دسترسی مجاز نیست.');
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'ورود به پنل مدیریت';
+    }
+  });
+})();
+</script>
+</body>
+</html>

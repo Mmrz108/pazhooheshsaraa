@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>پنل کاربری | پژوهش‌سرا</title>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/auth.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Vazirmatn', sans-serif;
+    background: #F8FAFC;
+    color: #0F172A;
+    min-height: 100svh;
+    direction: rtl;
+  }
+  .dash-header {
+    background: #fff;
+    border-bottom: 1px solid #E2E8F0;
+    padding: 0 1.25rem;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .dash-header a { color: #2563EB; text-decoration: none; font-weight: 600; font-size: 0.9rem; }
+  .btn-home {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    border: 1.5px solid #BFDBFE;
+    background: #EFF6FF;
+    color: #1D4ED8;
+    border-radius: 10px;
+    padding: 0.55rem 1.1rem;
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 0.88rem;
+    text-decoration: none;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .btn-home:hover { background: #DBEAFE; border-color: #93C5FD; }
+  .dash-actions { margin-top: 1.25rem; }
+  .dash-wrap { max-width: 960px; margin: 0 auto; padding: 2rem 1.25rem; }
+  .dash-card {
+    background: #fff;
+    border: 1px solid #E2E8F0;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 4px 20px rgba(15,23,42,0.04);
+  }
+  .dash-card h1 { font-size: 1.35rem; margin-bottom: 0.25rem; }
+  .dash-card p { color: #64748B; font-size: 0.88rem; }
+  .dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1.25rem; }
+  .dash-stat {
+    background: linear-gradient(135deg, rgba(37,99,235,0.06), rgba(124,58,237,0.06));
+    border-radius: 12px;
+    padding: 1rem;
+  }
+  .dash-stat strong { display: block; font-size: 1.4rem; margin-bottom: 0.2rem; }
+  .dash-stat span { font-size: 0.78rem; color: #64748B; }
+  .dash-list { list-style: none; margin-top: 1rem; }
+  .dash-list li {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #F1F5F9;
+    font-size: 0.88rem;
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .btn-logout {
+    border: 1.5px solid #FECACA;
+    background: #FEF2F2;
+    color: #B91C1C;
+    border-radius: 10px;
+    padding: 0.45rem 1rem;
+    font-family: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.82rem;
+  }
+  .loading { text-align: center; padding: 3rem; color: #64748B; }
+</style>
+</head>
+<body>
+<header class="dash-header">
+  <a href="/" class="btn-home">بازگشت به صفحه اصلی</a>
+  <button type="button" class="btn-logout" id="logout-btn">خروج</button>
+</header>
+
+<main class="dash-wrap" id="dash-content">
+  <div class="loading">در حال بارگذاری...</div>
+</main>
+
+<script src="/js/api.js"></script>
+<script src="/js/auth.js"></script>
+<script>
+(async function initDashboard() {
+  const token = localStorage.getItem('access_token');
+  if (!token) {
+    window.location.href = '/?auth=1';
+    return;
+  }
+
+  const content = document.getElementById('dash-content');
+  try {
+    const [profile, courses, payments] = await Promise.all([
+      apiFetch('/dashboard/profile/'),
+      apiFetch('/dashboard/courses/'),
+      apiFetch('/dashboard/payments/'),
+    ]);
+    const courseList = courses.results || courses;
+    const paymentList = payments.results || payments;
+
+    content.innerHTML = `
+      <div class="dash-card">
+        <h1>سلام، ${profile.first_name} ${profile.last_name}</h1>
+        <p>موبایل: ${profile.mobile} · کد ملی: ${profile.national_code}</p>
+        <div class="dash-grid">
+          <div class="dash-stat"><strong>${courseList.length}</strong><span>دوره ثبت‌نام‌شده</span></div>
+          <div class="dash-stat"><strong>${paymentList.length}</strong><span>تراکنش</span></div>
+        </div>
+        <div class="dash-actions">
+          <a href="/" class="btn-home">بازگشت به صفحه اصلی</a>
+        </div>
+      </div>
+      <div class="dash-card">
+        <h2 style="font-size:1.05rem;margin-bottom:0.5rem">دوره‌های من</h2>
+        <ul class="dash-list">
+          ${courseList.length ? courseList.map(c => `
+            <li><span>${c.course_title}</span><span>${c.status === 'paid' ? 'فعال' : c.status}</span></li>
+          `).join('') : '<li>هنوز در دوره‌ای ثبت‌نام نکرده‌اید.</li>'}
+        </ul>
+      </div>`;
+  } catch {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('user');
+    window.location.href = '/?auth=1';
+  }
+
+  document.getElementById('logout-btn')?.addEventListener('click', async () => {
+    const refresh = localStorage.getItem('refresh_token');
+    try {
+      if (refresh) await apiFetch('/auth/logout/', { method: 'POST', body: JSON.stringify({ refresh }) });
+    } catch (_) {}
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('user');
+    window.dispatchEvent(new Event('auth:logout'));
+    window.location.href = '/';
+  });
+})();
+</script>
+</body>
+</html>

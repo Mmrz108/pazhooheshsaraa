@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="جزئیات دوره آموزشی">
+<title>جزئیات دوره | پژوهش‌سرا</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --primary: #2563EB; --secondary: #7C3AED; --bg: #F8FAFC;
+    --text: #0F172A; --text-muted: #64748B; --border: #E2E8F0;
+    --card-radius: 16px; --transition: all 0.3s ease;
+  }
+  body { font-family: 'Vazirmatn', sans-serif; background: var(--bg); color: var(--text); direction: rtl; }
+  .header {
+    position: fixed; top: 0; right: 0; left: 0; z-index: 100;
+    background: rgba(255,255,255,0.92); backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border); height: 64px;
+    display: flex; align-items: center; justify-content: space-between; padding: 0 1.25rem;
+  }
+  .logo { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: inherit; }
+  .logo-img { width: 42px; height: 42px; border-radius: 10px; object-fit: cover; }
+  .logo-text { font-size: 1.1rem; font-weight: 700; display: block; line-height: 1.2; }
+  .logo-sub { font-size: 0.65rem; color: var(--text-muted); display: block; }
+  .page-main { padding: 6.5rem 1.25rem 3rem; max-width: 1100px; margin: 0 auto; }
+  .breadcrumb { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.25rem; }
+  .breadcrumb a { color: var(--primary); text-decoration: none; }
+  .course-detail {
+    display: grid; grid-template-columns: 1fr; gap: 1.5rem;
+  }
+  @media (min-width: 900px) {
+    .course-detail { grid-template-columns: 1.1fr 0.9fr; align-items: start; }
+  }
+  .course-hero {
+    background: #fff; border: 1.5px solid var(--border); border-radius: var(--card-radius);
+    overflow: hidden;
+  }
+  .course-hero-img { width: 100%; aspect-ratio: 16/10; object-fit: cover; display: block; }
+  .course-hero-placeholder {
+    width: 100%; aspect-ratio: 16/10; display: flex; align-items: center; justify-content: center;
+    font-size: 4rem; background: linear-gradient(135deg,#EFF6FF,#EDE9FE);
+  }
+  .course-content { padding: 1.5rem; }
+  .course-badges { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1rem; }
+  .badge { padding: 0.25rem 0.7rem; border-radius: 100px; font-size: 0.75rem; font-weight: 600; }
+  .badge-blue { background: #EFF6FF; color: #1D4ED8; }
+  .badge-green { background: #F0FDF4; color: #15803D; }
+  .badge-purple { background: #F5F3FF; color: #6D28D9; }
+  .course-title { font-size: clamp(1.5rem, 4vw, 2rem); font-weight: 800; line-height: 1.4; margin-bottom: 1rem; }
+  .course-desc {
+    color: var(--text-muted); line-height: 1.9; font-size: 0.95rem; white-space: pre-line;
+  }
+  .course-sidebar {
+    background: #fff; border: 1.5px solid var(--border); border-radius: var(--card-radius);
+    padding: 1.5rem; position: sticky; top: 5.5rem;
+  }
+  .price-box {
+    font-size: 1.5rem; font-weight: 800; color: var(--primary); margin-bottom: 1.25rem;
+  }
+  .info-list { list-style: none; display: flex; flex-direction: column; gap: 0.85rem; margin-bottom: 1.5rem; }
+  .info-list li {
+    display: flex; justify-content: space-between; gap: 1rem;
+    font-size: 0.85rem; padding-bottom: 0.85rem; border-bottom: 1px solid var(--border);
+  }
+  .info-list li:last-child { border-bottom: none; padding-bottom: 0; }
+  .info-list span:first-child { color: var(--text-muted); }
+  .info-list span:last-child { font-weight: 600; text-align: left; }
+  .btn-enroll {
+    width: 100%; background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: #fff; border: none; border-radius: 12px; padding: 0.9rem 1rem;
+    font-family: inherit; font-size: 0.95rem; font-weight: 700; cursor: pointer;
+    transition: var(--transition);
+  }
+  .btn-enroll:hover { opacity: 0.92; transform: translateY(-1px); }
+  .btn-enroll:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+  .loading-state, .empty-state { text-align: center; padding: 4rem 1rem; color: var(--text-muted); }
+  .footer-mini {
+    text-align: center; padding: 2rem 1rem; color: var(--text-muted); font-size: 0.8rem;
+    border-top: 1px solid var(--border); margin-top: 3rem;
+  }
+  .footer-mini a { color: var(--primary); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <a href="/" class="logo" data-site-logo>
+    <img class="logo-img" src="/images/logo.jpg" alt="پژوهش‌سرا" width="42" height="42">
+    <div>
+      <span class="logo-text">پژوهش‌سرا</span>
+      <span class="logo-sub">مرکز علوم و فناوری</span>
+    </div>
+  </a>
+</header>
+
+<main class="page-main" data-course-detail>
+  <div class="loading-state">در حال بارگذاری دوره...</div>
+</main>
+
+<footer class="footer-mini">
+  <a href="/courses/">بازگشت به لیست دوره‌ها</a> · تمامی حقوق برای پژوهشسرا دانش آموزی شهید حجتی (نجف آباد) محفوظ می‌باشد.
+</footer>
+
+<script src="/js/api.js"></script>
+<script src="/js/utils.js"></script>
+<script src="/js/components.js"></script>
+<script src="/js/app.js"></script>
+</body>
+</html>

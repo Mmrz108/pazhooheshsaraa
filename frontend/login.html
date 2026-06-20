@@ -1,0 +1,1657 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ورود | پژوهش‌سرا</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --primary:      #2563EB;
+  --primary-dark: #1D4ED8;
+  --secondary:    #7C3AED;
+  --accent:       #06B6D4;
+  --bg:           #F8FAFC;
+  --text:         #0F172A;
+  --text-muted:   #64748B;
+  --border:       #E2E8F0;
+  --error:        #EF4444;
+  --success:      #22C55E;
+  --transition:   all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Vazirmatn', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  direction: rtl;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ══════════════════════════════
+   BACKGROUND
+══════════════════════════════ */
+.page-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: 0.1;
+}
+
+.blob-1 { width: 640px; height: 640px; background: var(--primary);   top: -220px; right: -160px; }
+.blob-2 { width: 500px; height: 500px; background: var(--secondary); bottom: -160px; left: -100px; }
+.blob-3 { width: 280px; height: 280px; background: var(--accent);    top: 38%; left: 38%; opacity: 0.06; }
+
+.bg-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(37,99,235,0.032) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(37,99,235,0.032) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+/* Floating dots decoration */
+.bg-dots {
+  position: absolute;
+  inset: 0;
+}
+
+.bg-dot {
+  position: absolute;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  opacity: 0.12;
+  animation: floatDot linear infinite;
+}
+
+@keyframes floatDot {
+  0%   { transform: translateY(0)   rotate(0deg);   }
+  100% { transform: translateY(-80px) rotate(360deg); }
+}
+
+/* ══════════════════════════════
+   HEADER
+══════════════════════════════ */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.5rem;
+  background: rgba(255,255,255,0.82);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(226,232,240,0.6);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+}
+
+.logo-icon {
+  width: 38px; height: 38px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.logo-icon svg { width: 22px; height: 22px; fill: white; }
+.logo-text { font-size: 1.05rem; font-weight: 700; color: var(--text); line-height: 1.2; }
+.logo-sub  { font-size: 0.62rem; color: var(--text-muted); font-weight: 400; display: block; }
+
+.header-register {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-decoration: none;
+  padding: 0.45rem 1rem;
+  border: 1.5px solid rgba(37,99,235,0.3);
+  border-radius: 10px;
+  transition: var(--transition);
+}
+
+.header-register:hover {
+  background: rgba(37,99,235,0.06);
+  border-color: var(--primary);
+}
+
+.header-register svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+/* ══════════════════════════════
+   LAYOUT
+══════════════════════════════ */
+.page-wrap {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.25rem;
+}
+
+/* ══════════════════════════════
+   CARD
+══════════════════════════════ */
+.card {
+  width: 100%;
+  max-width: 440px;
+  background: rgba(255,255,255,0.94);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid rgba(226,232,240,0.75);
+  border-radius: 24px;
+  box-shadow:
+    0 2px 4px rgba(0,0,0,0.02),
+    0 20px 60px rgba(15,23,42,0.09),
+    0 0 0 1px rgba(255,255,255,0.5) inset;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Top gradient bar */
+.card-top-bar {
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+}
+
+.card-body {
+  padding: 2.25rem 2rem 2rem;
+}
+
+@media(max-width: 480px) {
+  .card { border-radius: 18px; }
+  .card-body { padding: 1.75rem 1.35rem 1.75rem; }
+}
+
+/* ══════════════════════════════
+   STEP PANELS
+══════════════════════════════ */
+.step-panel {
+  display: none;
+}
+
+.step-panel.active {
+  display: block;
+  animation: stepIn 0.38s cubic-bezier(0.4,0,0.2,1) both;
+}
+
+@keyframes stepIn {
+  from { opacity: 0; transform: translateX(-18px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.step-panel.exit {
+  animation: stepOut 0.26s cubic-bezier(0.4,0,0.2,1) both;
+}
+
+@keyframes stepOut {
+  from { opacity: 1; transform: translateX(0); }
+  to   { opacity: 0; transform: translateX(18px); }
+}
+
+/* ══════════════════════════════
+   BRAND BADGE (top of panel 1)
+══════════════════════════════ */
+.brand-block {
+  text-align: center;
+  margin-bottom: 1.75rem;
+}
+
+.brand-icon {
+  width: 72px; height: 72px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+  box-shadow: 0 8px 28px rgba(37,99,235,0.28);
+  animation: brandPop 0.6s cubic-bezier(0.34,1.4,0.64,1) both;
+}
+
+@keyframes brandPop {
+  from { transform: scale(0.7) rotate(-8deg); opacity: 0; }
+  to   { transform: scale(1) rotate(0deg);   opacity: 1; }
+}
+
+.brand-icon svg { width: 34px; height: 34px; fill: white; }
+
+.brand-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.2;
+  margin-bottom: 0.35rem;
+}
+
+.brand-title span {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.brand-sub {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+/* ══════════════════════════════
+   PHONE INPUT
+══════════════════════════════ */
+.phone-field {
+  margin-bottom: 0.6rem;
+}
+
+.field-label {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+}
+
+.field-label svg {
+  width: 15px; height: 15px;
+  stroke: var(--primary); fill: none; stroke-width: 2;
+}
+
+.phone-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.phone-prefix {
+  position: absolute;
+  right: 1rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  pointer-events: none;
+  user-select: none;
+  z-index: 1;
+}
+
+.phone-prefix::after {
+  content: '';
+  width: 1px;
+  height: 20px;
+  background: var(--border);
+  margin-right: 0.5rem;
+  margin-left: 0;
+}
+
+.phone-prefix-flag { font-size: 1.1rem; }
+
+.phone-input {
+  width: 100%;
+  height: 56px;
+  background: var(--bg);
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  padding: 0 5.5rem 0 3rem;
+  font-family: 'Vazirmatn', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text);
+  direction: ltr;
+  text-align: right;
+  letter-spacing: 0.06em;
+  outline: none;
+  transition: var(--transition);
+  caret-color: var(--primary);
+}
+
+.phone-input::placeholder {
+  font-weight: 400;
+  color: var(--text-muted);
+  letter-spacing: 0.03em;
+  font-size: 0.9rem;
+}
+
+.phone-input:hover {
+  border-color: #CBD5E1;
+  background: white;
+}
+
+.phone-input:focus {
+  border-color: var(--primary);
+  background: white;
+  box-shadow: 0 0 0 4px rgba(37,99,235,0.1);
+}
+
+.phone-input.error {
+  border-color: var(--error);
+  background: #FEF2F2;
+  box-shadow: 0 0 0 4px rgba(239,68,68,0.08);
+}
+
+.phone-input.valid {
+  border-color: var(--success);
+  background: #F0FDF4;
+}
+
+/* Clear button inside input */
+.phone-clear {
+  position: absolute;
+  left: 0.9rem;
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: var(--border);
+  border: none;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+
+.phone-clear.show { display: flex; }
+.phone-clear:hover { background: #CBD5E1; }
+.phone-clear svg { width: 13px; height: 13px; stroke: var(--text-muted); fill: none; stroke-width: 2.5; }
+
+.field-error {
+  display: none;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.74rem;
+  font-weight: 500;
+  color: var(--error);
+  margin-top: 0.4rem;
+}
+
+.field-error.show { display: flex; }
+.field-error svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2.5; flex-shrink: 0; }
+
+.field-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  margin-top: 0.4rem;
+}
+
+.field-hint svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2; flex-shrink: 0; }
+
+/* ══════════════════════════════
+   TERMS
+══════════════════════════════ */
+.terms-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  margin: 1rem 0 1.25rem;
+  cursor: pointer;
+}
+
+.terms-check {
+  width: 20px; height: 20px;
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  background: white;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+  margin-top: 1px;
+}
+
+.terms-check.checked {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  border-color: transparent;
+}
+
+.terms-check svg { width: 12px; height: 12px; stroke: white; fill: none; stroke-width: 3; opacity: 0; transition: var(--transition); }
+.terms-check.checked svg { opacity: 1; }
+
+.terms-text {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.65;
+}
+
+.terms-text a {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+  border-bottom: 1px dashed rgba(37,99,235,0.4);
+  transition: var(--transition);
+}
+
+.terms-text a:hover { border-bottom-color: var(--primary); }
+
+/* ══════════════════════════════
+   BUTTONS
+══════════════════════════════ */
+.btn-primary {
+  width: 100%;
+  height: 54px;
+  border: none;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  font-family: 'Vazirmatn', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.16), transparent);
+  opacity: 0;
+  transition: var(--transition);
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 32px rgba(37,99,235,0.38);
+}
+
+.btn-primary:hover:not(:disabled)::before { opacity: 1; }
+.btn-primary:active:not(:disabled) { transform: translateY(0); }
+
+.btn-primary:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+}
+
+.btn-primary svg { width: 19px; height: 19px; stroke: white; fill: none; stroke-width: 2.2; stroke-linecap: round; }
+
+.btn-ghost {
+  width: 100%;
+  height: 46px;
+  border: 1.5px solid rgba(37,99,235,0.24);
+  border-radius: 12px;
+  background: transparent;
+  color: var(--primary);
+  font-family: 'Vazirmatn', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  transition: var(--transition);
+  text-decoration: none;
+  margin-top: 0.6rem;
+}
+
+.btn-ghost:hover { background: rgba(37,99,235,0.05); border-color: var(--primary); }
+.btn-ghost svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+/* ══════════════════════════════
+   DIVIDER
+══════════════════════════════ */
+.or-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1.1rem 0;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.or-divider::before,
+.or-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ══════════════════════════════
+   REGISTER LINK
+══════════════════════════════ */
+.register-prompt {
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border);
+}
+
+.register-prompt a {
+  color: var(--primary);
+  font-weight: 700;
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+.register-prompt a:hover { text-decoration: underline; }
+
+/* ══════════════════════════════
+   OTP PANEL SPECIFIC
+══════════════════════════════ */
+.otp-head {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.otp-icon-wrap {
+  width: 72px; height: 72px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(37,99,235,0.09), rgba(124,58,237,0.09));
+  border: 1.5px solid rgba(37,99,235,0.14);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+  position: relative;
+  animation: iconIn 0.5s cubic-bezier(0.34,1.3,0.64,1) both;
+}
+
+@keyframes iconIn {
+  from { transform: scale(0.6) rotate(10deg); opacity: 0; }
+  to   { transform: scale(1) rotate(0);       opacity: 1; }
+}
+
+.otp-icon-wrap svg {
+  width: 34px; height: 34px;
+  stroke: url(#g1); fill: none; stroke-width: 1.8; stroke-linecap: round;
+}
+
+/* Animated signal bars */
+.signal-bar {
+  position: absolute;
+  border-radius: 2px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  bottom: 6px;
+  opacity: 0;
+  animation: signalPulse 1.8s ease-in-out infinite;
+}
+
+.signal-bar-1 { right: 10px; width: 3px; height: 6px;  animation-delay: 0s; }
+.signal-bar-2 { right: 16px; width: 3px; height: 10px; animation-delay: 0.2s; }
+.signal-bar-3 { right: 22px; width: 3px; height: 14px; animation-delay: 0.4s; }
+
+@keyframes signalPulse {
+  0%, 100% { opacity: 0.25; }
+  50%       { opacity: 1; }
+}
+
+.otp-title { font-size: 1.35rem; font-weight: 800; color: var(--text); margin-bottom: 0.35rem; }
+.otp-sub   { font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; }
+
+/* Phone display badge */
+.phone-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: linear-gradient(135deg, rgba(37,99,235,0.07), rgba(124,58,237,0.07));
+  border: 1.5px solid rgba(37,99,235,0.14);
+  border-radius: 100px;
+  padding: 0.45rem 1.1rem;
+  margin: 0.9rem auto 0.4rem;
+  width: fit-content;
+}
+
+.phone-tag svg { width: 14px; height: 14px; stroke: var(--primary); fill: none; stroke-width: 2; }
+.phone-tag-num { font-size: 0.97rem; font-weight: 700; color: var(--primary); direction: ltr; letter-spacing: 0.07em; }
+
+.edit-number {
+  display: block;
+  text-align: center;
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  margin-bottom: 1.5rem;
+}
+
+.edit-number button {
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-family: 'Vazirmatn', sans-serif;
+  font-size: 0.74rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0 0.15rem;
+  border-bottom: 1px dashed rgba(37,99,235,0.4);
+  transition: var(--transition);
+}
+
+.edit-number button:hover { border-bottom-color: var(--primary); }
+
+/* ── OTP BOXES ── */
+.otp-row-label {
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.9rem;
+}
+
+.otp-boxes {
+  display: flex;
+  justify-content: center;
+  gap: 0.6rem;
+  direction: ltr;
+  margin-bottom: 0.6rem;
+}
+
+.otp-cell {
+  position: relative;
+  flex: 1;
+  max-width: 54px;
+}
+
+.otp-inp {
+  width: 100%;
+  height: 62px;
+  text-align: center;
+  font-family: 'Vazirmatn', sans-serif;
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: var(--text);
+  background: var(--bg);
+  border: 2px solid var(--border);
+  border-radius: 13px;
+  outline: none;
+  caret-color: var(--primary);
+  transition: var(--transition);
+  -moz-appearance: textfield;
+  appearance: textfield;
+  display: block;
+}
+
+.otp-inp::-webkit-inner-spin-button,
+.otp-inp::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+.otp-inp:focus {
+  border-color: var(--primary);
+  background: white;
+  box-shadow: 0 0 0 4px rgba(37,99,235,0.1);
+  transform: translateY(-3px) scale(1.04);
+}
+
+.otp-inp.filled {
+  border-color: var(--secondary);
+  background: linear-gradient(135deg, rgba(37,99,235,0.03), rgba(124,58,237,0.06));
+  color: var(--secondary);
+}
+
+.otp-inp.err {
+  border-color: var(--error) !important;
+  background: #FEF2F2 !important;
+  color: var(--error);
+  animation: shakeX 0.42s ease;
+}
+
+.otp-inp.ok {
+  border-color: var(--success) !important;
+  background: #F0FDF4 !important;
+  color: #16A34A;
+  animation: popUp 0.35s cubic-bezier(0.34,1.56,0.64,1);
+}
+
+@keyframes shakeX {
+  0%,100% { transform: translateX(0); }
+  20%     { transform: translateX(-5px); }
+  40%     { transform: translateX(5px); }
+  60%     { transform: translateX(-3px); }
+  80%     { transform: translateX(3px); }
+}
+
+@keyframes popUp {
+  0%   { transform: scale(0.88); }
+  100% { transform: translateY(-3px) scale(1); }
+}
+
+/* ── OTP STATUS ── */
+.otp-status {
+  min-height: 1.5rem;
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  transition: var(--transition);
+}
+
+.otp-status svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2.5; }
+.otp-status.err  { color: var(--error); }
+.otp-status.ok   { color: #16A34A; }
+
+/* ── TIMER ── */
+.timer-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin: 1rem 0 1.4rem;
+}
+
+.timer-circle {
+  position: relative;
+  width: 48px; height: 48px;
+  flex-shrink: 0;
+}
+
+.timer-circle svg {
+  width: 48px; height: 48px;
+  transform: rotate(-90deg);
+}
+
+.tcircle-bg   { fill: none; stroke: var(--border);  stroke-width: 3.5; }
+.tcircle-fill {
+  fill: none;
+  stroke: url(#timerG);
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  stroke-dasharray: 125.6;
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 1s linear;
+}
+
+.timer-inner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--primary);
+  direction: ltr;
+}
+
+.timer-right { display: flex; flex-direction: column; gap: 0.2rem; }
+
+.timer-msg {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.resend-btn {
+  background: none;
+  border: none;
+  font-family: 'Vazirmatn', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--primary);
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: var(--transition);
+}
+
+.resend-btn:disabled { color: var(--text-muted); cursor: default; font-weight: 500; }
+.resend-btn:not(:disabled):hover { color: var(--primary-dark); text-decoration: underline; }
+.resend-btn svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2.5; }
+
+/* ── SECURITY ── */
+.security-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.1rem;
+  margin-top: 1.1rem;
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.sec-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}
+
+.sec-badge svg { width: 12px; height: 12px; stroke: var(--success); fill: none; stroke-width: 2.5; }
+
+/* ══════════════════════════════
+   SPINNER
+══════════════════════════════ */
+.spin {
+  width: 20px; height: 20px;
+  border: 2.5px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spinAnim 0.65s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spinAnim { to { transform: rotate(360deg); } }
+
+/* ══════════════════════════════
+   SUCCESS OVERLAY
+══════════════════════════════ */
+.overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: rgba(15,23,42,0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  animation: fadeIn 0.3s ease;
+}
+
+.overlay.show { display: flex; }
+
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+.success-box {
+  width: 100%;
+  max-width: 380px;
+  background: white;
+  border-radius: 24px;
+  padding: 2.5rem 2rem 2rem;
+  text-align: center;
+  box-shadow: 0 32px 80px rgba(15,23,42,0.2);
+  animation: boxIn 0.5s cubic-bezier(0.34,1.3,0.64,1) both;
+}
+
+@keyframes boxIn {
+  from { transform: scale(0.8) translateY(30px); opacity: 0; }
+  to   { transform: scale(1) translateY(0);      opacity: 1; }
+}
+
+.success-ring {
+  width: 92px; height: 92px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #DCFCE7, #BBF7D0);
+  border: 2px solid #86EFAC;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.25rem;
+}
+
+.check-svg {
+  width: 50px; height: 50px;
+  stroke: #16A34A; fill: none;
+  stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round;
+  stroke-dasharray: 115;
+  stroke-dashoffset: 115;
+}
+
+.check-svg.draw { animation: drawCheck 0.55s ease 0.15s forwards; }
+
+@keyframes drawCheck { to { stroke-dashoffset: 0; } }
+
+.success-title { font-size: 1.4rem; font-weight: 800; margin-bottom: 0.4rem; }
+.success-title span {
+  background: linear-gradient(135deg, #16A34A, var(--primary));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+
+.success-name {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 1.5rem;
+  line-height: 1.65;
+}
+
+.success-name strong { color: var(--text); font-weight: 700; }
+
+.welcome-badges {
+  display: flex;
+  gap: 0.6rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 1.75rem;
+}
+
+.welcome-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.35rem 0.8rem;
+  border-radius: 100px;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.wb-blue   { background: #EFF6FF; color: #1D4ED8; }
+.wb-purple { background: #F5F3FF; color: #6D28D9; }
+.wb-green  { background: #F0FDF4; color: #15803D; }
+
+.btn-dashboard {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  width: 100%;
+  height: 52px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  border: none;
+  border-radius: 13px;
+  font-family: 'Vazirmatn', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  transition: var(--transition);
+  margin-bottom: 0.65rem;
+}
+
+.btn-dashboard:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(37,99,235,0.32); }
+.btn-dashboard svg { width: 18px; height: 18px; stroke: white; fill: none; stroke-width: 2; }
+
+.btn-home-outline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  width: 100%;
+  height: 44px;
+  background: transparent;
+  border: 1.5px solid rgba(37,99,235,0.25);
+  border-radius: 12px;
+  font-family: 'Vazirmatn', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--primary);
+  cursor: pointer;
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+.btn-home-outline:hover { background: rgba(37,99,235,0.05); border-color: var(--primary); }
+</style>
+</head>
+<body>
+
+<!-- ── SVG gradient defs ── -->
+<svg width="0" height="0" style="position:absolute;pointer-events:none" aria-hidden="true">
+  <defs>
+    <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#2563EB"/>
+      <stop offset="100%" stop-color="#7C3AED"/>
+    </linearGradient>
+    <linearGradient id="timerG" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="#2563EB"/>
+      <stop offset="100%" stop-color="#7C3AED"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<!-- ── BACKGROUND ── -->
+<div class="page-bg" aria-hidden="true">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+  <div class="bg-grid"></div>
+  <div class="bg-dots" id="bg-dots"></div>
+</div>
+
+<!-- ── HEADER ── -->
+<header class="header" role="banner">
+  <a href="index.html" class="logo" aria-label="پژوهش‌سرا - صفحه اصلی">
+    <div class="logo-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    </div>
+    <div>
+      <span class="logo-text">پژوهش‌سرا</span>
+      <span class="logo-sub">مرکز علوم و فناوری</span>
+    </div>
+  </a>
+  <a href="register.html" class="header-register">
+    <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+    ثبت‌نام
+  </a>
+</header>
+
+<!-- ── MAIN ── -->
+<main class="page-wrap">
+  <div class="card" role="main">
+
+    <!-- Gradient top bar -->
+    <div class="card-top-bar" aria-hidden="true"></div>
+
+    <div class="card-body">
+
+      <!-- ══════════════════════════
+           PANEL 1 — PHONE ENTRY
+      ══════════════════════════ -->
+      <div class="step-panel active" id="panel-phone">
+
+        <!-- Brand block -->
+        <div class="brand-block">
+          <div class="brand-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          </div>
+          <h1 class="brand-title">خوش آمدید به<br><span>پژوهش‌سرا</span></h1>
+          <p class="brand-sub">شماره موبایل خود را وارد کنید تا کد تأیید ارسال شود</p>
+        </div>
+
+        <!-- Phone input -->
+        <div class="phone-field">
+          <label class="field-label" for="phone-inp">
+            <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.83a16 16 0 0 0 6.29 6.29l.84-.84a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            شماره موبایل
+          </label>
+          <div class="phone-input-wrap">
+            <div class="phone-prefix" aria-hidden="true">
+              <span class="phone-prefix-flag">🇮🇷</span>
+              +98
+            </div>
+            <input
+              class="phone-input"
+              type="tel"
+              id="phone-inp"
+              placeholder="۰۹۱۲ ۳۴۵ ۶۷۸۹"
+              inputmode="numeric"
+              maxlength="11"
+              autocomplete="tel"
+              aria-required="true"
+              aria-describedby="phone-err phone-hint-msg"
+              oninput="onPhoneChange(this)"
+              onkeydown="onPhoneKey(event)"
+            >
+            <button
+              class="phone-clear"
+              id="phone-clear"
+              type="button"
+              tabindex="-1"
+              aria-label="پاک کردن شماره"
+              onclick="clearPhone()"
+            >
+              <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+          <div class="field-error" id="phone-err" role="alert">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+            <span id="phone-err-msg">شماره موبایل معتبر نیست</span>
+          </div>
+          <div class="field-hint" id="phone-hint-msg">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            کد OTP پیامک می‌شود
+          </div>
+        </div>
+
+        <!-- Terms -->
+        <div
+          class="terms-row"
+          onclick="toggleTerms()"
+          role="checkbox"
+          aria-checked="false"
+          id="terms-row"
+          tabindex="0"
+          onkeydown="if(event.key===' '||event.key==='Enter'){toggleTerms();event.preventDefault()}"
+          aria-label="موافقت با قوانین و مقررات"
+        >
+          <div class="terms-check" id="terms-check">
+            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <span class="terms-text">
+            با ورود به سایت، <a href="#" onclick="event.stopPropagation()">قوانین و مقررات</a>
+            و <a href="#" onclick="event.stopPropagation()">سیاست حریم خصوصی</a>
+            پژوهش‌سرا را می‌پذیرم.
+          </span>
+        </div>
+
+        <!-- Send OTP button -->
+        <button
+          class="btn-primary"
+          id="send-btn"
+          disabled
+          onclick="sendOtp()"
+          aria-label="ارسال کد تأیید"
+        >
+          <span id="send-btn-text">ارسال کد تأیید</span>
+          <svg id="send-btn-icon" viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/></svg>
+        </button>
+
+        <div class="or-divider" aria-hidden="true">یا</div>
+
+        <!-- Register link -->
+        <a href="register.html" class="btn-ghost">
+          <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+          حساب ندارم — ثبت‌نام می‌کنم
+        </a>
+
+        <!-- Security -->
+        <div class="security-row" role="note">
+          <div class="sec-badge">
+            <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            اتصال امن
+          </div>
+          <div class="sec-badge">
+            <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            رمزنگاری‌شده
+          </div>
+          <div class="sec-badge">
+            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            اطلاعات محرمانه
+          </div>
+        </div>
+
+      </div>
+      <!-- /panel-phone -->
+
+      <!-- ══════════════════════════
+           PANEL 2 — OTP VERIFY
+      ══════════════════════════ -->
+      <div class="step-panel" id="panel-otp">
+
+        <!-- Icon -->
+        <div class="otp-head">
+          <div class="otp-icon-wrap" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.83a16 16 0 0 0 6.29 6.29l.84-.84a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+            </svg>
+            <span class="signal-bar signal-bar-1"></span>
+            <span class="signal-bar signal-bar-2"></span>
+            <span class="signal-bar signal-bar-3"></span>
+          </div>
+
+          <h2 class="otp-title">کد تأیید را وارد کنید</h2>
+          <p class="otp-sub">پیامک ۶ رقمی ارسال‌شده به شماره زیر:</p>
+
+          <div class="phone-tag" aria-live="polite">
+            <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.83a16 16 0 0 0 6.29 6.29l.84-.84a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            <span class="phone-tag-num" id="otp-phone-show">0912 *** 6789</span>
+          </div>
+
+          <span class="edit-number">
+            شماره اشتباه است؟
+            <button onclick="goBackToPhone()" aria-label="تغییر شماره موبایل">تغییر شماره</button>
+          </span>
+        </div>
+
+        <!-- OTP boxes -->
+        <p class="otp-row-label" id="otp-row-label">کد ۶ رقمی را اینجا وارد کنید</p>
+
+        <div class="otp-boxes" role="group" aria-labelledby="otp-row-label" dir="ltr">
+          <div class="otp-cell"><input class="otp-inp" id="c1" type="number" inputmode="numeric" maxlength="1" aria-label="رقم ۱" oninput="ci(this,0)" onkeydown="ck(event,this,0)" autofocus></div>
+          <div class="otp-cell"><input class="otp-inp" id="c2" type="number" inputmode="numeric" maxlength="1" aria-label="رقم ۲" oninput="ci(this,1)" onkeydown="ck(event,this,1)"></div>
+          <div class="otp-cell"><input class="otp-inp" id="c3" type="number" inputmode="numeric" maxlength="1" aria-label="رقم ۳" oninput="ci(this,2)" onkeydown="ck(event,this,2)"></div>
+          <div class="otp-cell"><input class="otp-inp" id="c4" type="number" inputmode="numeric" maxlength="1" aria-label="رقم ۴" oninput="ci(this,3)" onkeydown="ck(event,this,3)"></div>
+          <div class="otp-cell"><input class="otp-inp" id="c5" type="number" inputmode="numeric" maxlength="1" aria-label="رقم ۵" oninput="ci(this,4)" onkeydown="ck(event,this,4)"></div>
+          <div class="otp-cell"><input class="otp-inp" id="c6" type="number" inputmode="numeric" maxlength="1" aria-label="رقم ۶" oninput="ci(this,5)" onkeydown="ck(event,this,5)"></div>
+        </div>
+
+        <!-- Status -->
+        <div class="otp-status" id="otp-st" role="alert" aria-live="assertive"></div>
+
+        <!-- Timer -->
+        <div class="timer-wrap" aria-live="polite">
+          <div class="timer-circle" aria-hidden="true">
+            <svg viewBox="0 0 48 48">
+              <circle class="tcircle-bg"   cx="24" cy="24" r="20"/>
+              <circle class="tcircle-fill" id="t-ring" cx="24" cy="24" r="20"/>
+            </svg>
+            <div class="timer-inner" id="t-text">1:30</div>
+          </div>
+          <div class="timer-right">
+            <span class="timer-msg" id="t-msg">ارسال مجدد کد تا پایان تایمر</span>
+            <button class="resend-btn" id="resend-btn" disabled onclick="resendOtp()" aria-label="ارسال مجدد کد تأیید">
+              <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/></svg>
+              ارسال مجدد کد
+            </button>
+          </div>
+        </div>
+
+        <!-- Verify button -->
+        <button
+          class="btn-primary"
+          id="verify-btn"
+          disabled
+          onclick="verifyOtp()"
+          aria-label="تأیید کد و ورود به حساب"
+        >
+          <span id="v-text">ورود به حساب</span>
+          <svg id="v-icon" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+        </button>
+
+        <a href="index.html" class="btn-ghost" style="margin-top:0.6rem">
+          <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          بازگشت به صفحه اصلی
+        </a>
+
+        <!-- Security -->
+        <div class="security-row" role="note">
+          <div class="sec-badge">
+            <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            اتصال امن
+          </div>
+          <div class="sec-badge">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            کد ۵ دقیقه اعتبار دارد
+          </div>
+          <div class="sec-badge">
+            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            رمزنگاری‌شده
+          </div>
+        </div>
+
+      </div>
+      <!-- /panel-otp -->
+
+    </div>
+    <!-- /card-body -->
+  </div>
+</main>
+
+<!-- ══════════════════════════
+     SUCCESS OVERLAY
+══════════════════════════ -->
+<div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-label="ورود موفق">
+  <div class="success-box">
+
+    <div class="success-ring" aria-hidden="true">
+      <svg class="check-svg" id="check-svg" viewBox="0 0 54 54">
+        <circle cx="27" cy="27" r="23" fill="none" stroke="#BBF7D0" stroke-width="1.5"/>
+        <polyline points="14.5 27 23 35.5 39.5 19"/>
+      </svg>
+    </div>
+
+    <h2 class="success-title">ورود <span>موفق بود!</span></h2>
+    <p class="success-name">
+      خوش آمدید،<br>
+      <strong id="s-name">کاربر گرامی</strong>
+    </p>
+
+    <div class="welcome-badges">
+      <span class="welcome-badge wb-blue">🎓 دوره‌های من</span>
+      <span class="welcome-badge wb-purple">🤖 انجمن‌ها</span>
+      <span class="welcome-badge wb-green">✅ حساب فعال</span>
+    </div>
+
+    <a href="index.html" class="btn-dashboard">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      رفتن به پنل کاربری
+    </a>
+    <a href="index.html" class="btn-home-outline">
+      <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="2" style="flex-shrink:0"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      صفحه اصلی
+    </a>
+
+  </div>
+</div>
+
+<script>
+/* ════════════════════════════════
+   CONFIG & STATE
+════════════════════════════════ */
+const CELLS      = ['c1','c2','c3','c4','c5','c6'];
+const TOTAL      = 90;
+const RING_C     = 125.6; // 2π × 20
+
+let phone        = '';
+let termsOk      = false;
+let timerSec     = TOTAL;
+let timerHandle  = null;
+let attempts     = 0;
+
+/* ════════════════════════════════
+   FLOATING DOTS (decorative)
+════════════════════════════════ */
+(function spawnDots() {
+  const wrap = document.getElementById('bg-dots');
+  for (let i = 0; i < 8; i++) {
+    const d = document.createElement('div');
+    d.className = 'bg-dot';
+    const size = 4 + Math.random() * 8;
+    d.style.cssText = [
+      `width:${size}px`, `height:${size}px`,
+      `right:${Math.random() * 100}%`,
+      `top:${20 + Math.random() * 60}%`,
+      `animation-duration:${6 + Math.random() * 8}s`,
+      `animation-delay:${Math.random() * 6}s`
+    ].join(';');
+    wrap.appendChild(d);
+  }
+})();
+
+/* ════════════════════════════════
+   PANEL 1 — PHONE
+════════════════════════════════ */
+function toEn(s) {
+  return String(s).replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
+}
+
+function onPhoneChange(el) {
+  let v = toEn(el.value).replace(/\D/g, '').slice(0, 11);
+  el.value = v;
+  phone = v;
+
+  // Clear button
+  document.getElementById('phone-clear').classList.toggle('show', v.length > 0);
+
+  // Validation state
+  const isValid = v.length === 11 && v.startsWith('09');
+  el.classList.toggle('valid', isValid);
+  el.classList.remove('error');
+  document.getElementById('phone-err').classList.remove('show');
+
+  updateSendBtn();
+}
+
+function onPhoneKey(e) {
+  if (e.key === 'Enter') {
+    const v = toEn(document.getElementById('phone-inp').value).replace(/\D/g,'');
+    if (v.length === 11 && v.startsWith('09') && termsOk) sendOtp();
+  }
+}
+
+function clearPhone() {
+  const el = document.getElementById('phone-inp');
+  el.value = '';
+  el.classList.remove('valid','error');
+  phone = '';
+  document.getElementById('phone-clear').classList.remove('show');
+  document.getElementById('phone-err').classList.remove('show');
+  updateSendBtn();
+  el.focus();
+}
+
+function toggleTerms() {
+  termsOk = !termsOk;
+  const row   = document.getElementById('terms-row');
+  const check = document.getElementById('terms-check');
+  row.setAttribute('aria-checked', String(termsOk));
+  check.classList.toggle('checked', termsOk);
+  updateSendBtn();
+}
+
+function updateSendBtn() {
+  const v     = toEn(document.getElementById('phone-inp').value).replace(/\D/g,'');
+  const valid = v.length === 11 && v.startsWith('09');
+  document.getElementById('send-btn').disabled = !(valid && termsOk);
+}
+
+function sendOtp() {
+  const v = toEn(document.getElementById('phone-inp').value).replace(/\D/g,'');
+
+  // Validate
+  if (v.length !== 11 || !v.startsWith('09')) {
+    const el = document.getElementById('phone-inp');
+    el.classList.add('error');
+    el.classList.remove('valid');
+    document.getElementById('phone-err').classList.add('show');
+    el.focus();
+    return;
+  }
+
+  phone = v;
+
+  // Loading
+  const btn  = document.getElementById('send-btn');
+  const text = document.getElementById('send-btn-text');
+  const icon = document.getElementById('send-btn-icon');
+  btn.disabled = true;
+  text.textContent = 'در حال ارسال پیامک...';
+  icon.style.display = 'none';
+  const sp = Object.assign(document.createElement('div'), { className: 'spin', id: 'sp1' });
+  btn.appendChild(sp);
+
+  setTimeout(() => {
+    document.getElementById('sp1')?.remove();
+    text.textContent = 'ارسال کد تأیید';
+    icon.style.display = '';
+    goToOtp();
+  }, 1300);
+}
+
+/* ════════════════════════════════
+   PANEL 2 — OTP
+════════════════════════════════ */
+function goToOtp() {
+  // Show masked phone
+  const masked = phone.slice(0,4) + ' *** ' + phone.slice(-4);
+  document.getElementById('otp-phone-show').textContent = masked;
+
+  switchPanel('panel-phone', 'panel-otp');
+  startTimer();
+  attempts = 0;
+  CELLS.forEach(id => {
+    const c = document.getElementById(id);
+    c.value = '';
+    c.className = 'otp-inp';
+  });
+  setSt('','');
+  document.getElementById('verify-btn').disabled = true;
+  setTimeout(() => document.getElementById('c1').focus(), 300);
+}
+
+function goBackToPhone() {
+  stopTimer();
+  switchPanel('panel-otp', 'panel-phone');
+  setTimeout(() => document.getElementById('phone-inp').focus(), 300);
+}
+
+function switchPanel(from, to) {
+  const f = document.getElementById(from);
+  const t = document.getElementById(to);
+  f.classList.remove('active');
+  f.classList.add('exit');
+  setTimeout(() => {
+    f.classList.remove('exit');
+    t.classList.add('active');
+  }, 260);
+}
+
+/* ── OTP input logic ── */
+function ci(el, idx) {
+  let v = el.value.replace(/\D/g, '');
+  if (v.length > 1) v = v[v.length - 1];
+  el.value = v;
+  el.classList.remove('err','ok');
+  if (v) {
+    el.classList.add('filled');
+    const next = document.getElementById(CELLS[idx + 1]);
+    if (next) next.focus();
+  } else {
+    el.classList.remove('filled');
+  }
+  checkFull();
+}
+
+function ck(e, el, idx) {
+  if (e.key === 'Backspace' && !el.value) {
+    const prev = document.getElementById(CELLS[idx - 1]);
+    if (prev) { prev.value = ''; prev.classList.remove('filled'); prev.focus(); }
+  }
+  if (e.key === 'ArrowRight' && idx > 0)  document.getElementById(CELLS[idx-1])?.focus();
+  if (e.key === 'ArrowLeft'  && idx < 5)  document.getElementById(CELLS[idx+1])?.focus();
+  if (e.key === 'Enter') {
+    const full = CELLS.every(id => document.getElementById(id)?.value.length === 1);
+    if (full) verifyOtp();
+  }
+}
+
+// Paste support
+document.addEventListener('DOMContentLoaded', () => {
+  CELLS.forEach(id => {
+    document.getElementById(id)?.addEventListener('paste', e => {
+      e.preventDefault();
+      const t = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g,'').slice(0,6);
+      CELLS.forEach((cid, i) => {
+        const b = document.getElementById(cid);
+        if (!b) return;
+        const ch = t[i] || '';
+        b.value = ch;
+        ch ? b.classList.add('filled') : b.classList.remove('filled');
+        b.classList.remove('err','ok');
+      });
+      checkFull();
+      document.getElementById(CELLS[Math.min(t.length,5)])?.focus();
+    });
+  });
+});
+
+function checkFull() {
+  const full = CELLS.every(id => document.getElementById(id)?.value.length === 1);
+  document.getElementById('verify-btn').disabled = !full;
+}
+
+function setSt(msg, type) {
+  const el = document.getElementById('otp-st');
+  el.className = 'otp-status' + (type ? ' ' + type : '');
+  if (!msg) { el.innerHTML = ''; return; }
+  const icons = {
+    err: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
+    ok:  '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg>'
+  };
+  el.innerHTML = (icons[type] || '') + msg;
+}
+
+/* ── Timer ── */
+function startTimer() {
+  stopTimer();
+  timerSec = TOTAL;
+  renderTimer();
+  document.getElementById('resend-btn').disabled = true;
+  document.getElementById('t-msg').textContent = 'ارسال مجدد کد تا پایان تایمر';
+  timerHandle = setInterval(() => {
+    timerSec--;
+    renderTimer();
+    if (timerSec <= 0) {
+      stopTimer();
+      document.getElementById('resend-btn').disabled = false;
+      document.getElementById('t-msg').textContent = 'می‌توانید کد جدید دریافت کنید';
+      document.getElementById('t-text').textContent = '0:00';
+    }
+  }, 1000);
+}
+
+function stopTimer() {
+  if (timerHandle) { clearInterval(timerHandle); timerHandle = null; }
+}
+
+function renderTimer() {
+  const m = Math.floor(timerSec / 60);
+  const s = timerSec % 60;
+  document.getElementById('t-text').textContent = m + ':' + String(s).padStart(2,'0');
+  const offset = RING_C * (1 - timerSec / TOTAL);
+  document.getElementById('t-ring').style.strokeDashoffset = offset;
+}
+
+function resendOtp() {
+  CELLS.forEach(id => {
+    const c = document.getElementById(id);
+    if (c) { c.value=''; c.className='otp-inp'; }
+  });
+  setSt('', '');
+  document.getElementById('verify-btn').disabled = true;
+  attempts = 0;
+  startTimer();
+  document.getElementById('c1').focus();
+  setSt('کد جدید ارسال شد ✓', 'ok');
+  setTimeout(() => setSt('',''), 3000);
+}
+
+/* ── Verify ── */
+function verifyOtp() {
+  const code = CELLS.map(id => document.getElementById(id)?.value || '').join('');
+
+  const btn  = document.getElementById('verify-btn');
+  const vt   = document.getElementById('v-text');
+  const vi   = document.getElementById('v-icon');
+  btn.disabled = true;
+  vt.textContent = 'در حال بررسی...';
+  vi.style.display = 'none';
+  const sp = Object.assign(document.createElement('div'), { className: 'spin', id: 'sp2' });
+  btn.appendChild(sp);
+  setSt('', '');
+
+  setTimeout(() => {
+    document.getElementById('sp2')?.remove();
+    vt.textContent = 'ورود به حساب';
+    vi.style.display = '';
+
+    if (code === '000000') {
+      attempts++;
+      CELLS.forEach((id, i) => setTimeout(() => document.getElementById(id)?.classList.add('err'), i * 45));
+      const left = Math.max(0, 3 - attempts);
+      setSt(left > 0 ? `کد اشتباه است — ${left} تلاش باقی‌مانده` : 'حساب موقتاً قفل شد', 'err');
+      setTimeout(() => {
+        CELLS.forEach(id => {
+          const c = document.getElementById(id);
+          if (c) { c.classList.remove('err'); c.value=''; c.classList.remove('filled'); }
+        });
+        btn.disabled = false;
+        document.getElementById('c1').focus();
+      }, 1700);
+    } else {
+      stopTimer();
+      CELLS.forEach((id, i) => {
+        setTimeout(() => {
+          const c = document.getElementById(id);
+          if (c) { c.classList.remove('filled'); c.classList.add('ok'); }
+        }, i * 65);
+      });
+      setSt('کد تأیید شد — در حال ورود...', 'ok');
+      setTimeout(showSuccess, 900);
+    }
+  }, 1500);
+}
+
+/* ── Success overlay ── */
+function showSuccess() {
+  // Set display name (from phone or stored form data)
+  const stored = sessionStorage.getItem('reg_name');
+  document.getElementById('s-name').textContent = stored || 'کاربر گرامی';
+
+  document.getElementById('overlay').classList.add('show');
+  setTimeout(() => document.getElementById('check-svg').classList.add('draw'), 200);
+  document.querySelector('.btn-dashboard').focus();
+}
+</script>
+</body>
+</html>

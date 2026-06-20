@@ -1,0 +1,1589 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="ثبت‌نام در پژوهش‌سرا — مرکز آموزش علوم و فناوری">
+<title>ثبت‌نام | پژوهش‌سرا</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --primary: #2563EB;
+  --primary-dark: #1D4ED8;
+  --secondary: #7C3AED;
+  --accent: #06B6D4;
+  --bg: #F8FAFC;
+  --text: #0F172A;
+  --text-muted: #64748B;
+  --border: #E2E8F0;
+  --border-focus: #2563EB;
+  --error: #EF4444;
+  --success: #22C55E;
+  --white: #ffffff;
+  --card-radius: 20px;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Vazirmatn', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  direction: rtl;
+  min-height: 100svh;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ─── BACKGROUND DECORATION ─── */
+.page-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.bg-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.12;
+}
+
+.bg-blob-1 {
+  width: 600px; height: 600px;
+  background: var(--primary);
+  top: -200px; right: -150px;
+}
+
+.bg-blob-2 {
+  width: 500px; height: 500px;
+  background: var(--secondary);
+  bottom: -150px; left: -100px;
+}
+
+.bg-blob-3 {
+  width: 300px; height: 300px;
+  background: var(--accent);
+  top: 40%; left: 40%;
+  opacity: 0.07;
+}
+
+.bg-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(37,99,235,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(37,99,235,0.04) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+/* ─── HEADER ─── */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(255,255,255,0.82);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(226,232,240,0.6);
+  padding: 0 1.5rem;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+}
+
+.logo-icon {
+  width: 38px; height: 38px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.logo-icon svg { width: 22px; height: 22px; fill: white; }
+
+.logo-text {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.logo-sub {
+  font-size: 0.62rem;
+  color: var(--text-muted);
+  font-weight: 400;
+  display: block;
+}
+
+.header-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 500;
+  text-decoration: none;
+  padding: 0.45rem 0.9rem;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  transition: var(--transition);
+}
+
+.header-back:hover {
+  color: var(--primary);
+  border-color: var(--primary);
+  background: rgba(37,99,235,0.04);
+}
+
+.header-back svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; }
+
+/* ─── LAYOUT ─── */
+.page-wrap {
+  position: relative;
+  z-index: 1;
+  min-height: calc(100svh - 64px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.25rem;
+}
+
+/* ─── STEP CARD ─── */
+.step-card {
+  width: 100%;
+  max-width: 540px;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(226,232,240,0.7);
+  border-radius: var(--card-radius);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.02), 0 20px 60px rgba(15,23,42,0.08);
+  padding: 2.25rem 2rem;
+  transition: var(--transition);
+}
+
+@media(max-width: 480px) {
+  .step-card { padding: 1.75rem 1.25rem; border-radius: 16px; }
+}
+
+/* ─── STEP INDICATOR ─── */
+.steps-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 2rem;
+}
+
+.step-dot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  position: relative;
+}
+
+.step-circle {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  border: 2px solid var(--border);
+  color: var(--text-muted);
+  background: white;
+  transition: var(--transition);
+  position: relative;
+  z-index: 1;
+}
+
+.step-circle.active {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  border-color: transparent;
+  color: white;
+  box-shadow: 0 4px 16px rgba(37,99,235,0.35);
+}
+
+.step-circle.done {
+  background: linear-gradient(135deg, #22C55E, #16A34A);
+  border-color: transparent;
+  color: white;
+}
+
+.step-circle.done svg { width: 16px; height: 16px; stroke: white; fill: none; stroke-width: 2.5; }
+
+.step-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.step-label.active { color: var(--primary); }
+.step-label.done { color: #16A34A; }
+
+.step-line {
+  flex: 1;
+  height: 2px;
+  background: var(--border);
+  margin: 0 0.5rem;
+  margin-bottom: 1.4rem;
+  min-width: 40px;
+  transition: var(--transition);
+  border-radius: 2px;
+}
+
+.step-line.done { background: linear-gradient(90deg, #22C55E, var(--primary)); }
+
+/* ─── CARD HEADER ─── */
+.card-head {
+  text-align: center;
+  margin-bottom: 1.75rem;
+}
+
+.card-icon {
+  width: 64px; height: 64px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(37,99,235,0.1), rgba(124,58,237,0.1));
+  border: 1.5px solid rgba(37,99,235,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+  font-size: 1.75rem;
+}
+
+.card-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 0.35rem;
+}
+
+.card-sub {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+/* ─── FORM ─── */
+.form { display: flex; flex-direction: column; gap: 1rem; }
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.field-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.field-label .req {
+  color: var(--error);
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+.field-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.field-icon {
+  position: absolute;
+  right: 0.9rem;
+  width: 18px; height: 18px;
+  stroke: var(--text-muted);
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  pointer-events: none;
+  transition: var(--transition);
+}
+
+.field-input {
+  width: 100%;
+  height: 52px;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 0 2.8rem 0 1rem;
+  font-family: 'Vazirmatn', sans-serif;
+  font-size: 0.9rem;
+  color: var(--text);
+  transition: var(--transition);
+  outline: none;
+  appearance: none;
+}
+
+.field-input::placeholder { color: var(--text-muted); font-size: 0.82rem; }
+
+.field-input:hover {
+  border-color: #CBD5E1;
+  background: white;
+}
+
+.field-input:focus {
+  border-color: var(--primary);
+  background: white;
+  box-shadow: 0 0 0 4px rgba(37,99,235,0.08);
+}
+
+.field-input:focus + .field-icon,
+.field-wrap:focus-within .field-icon {
+  stroke: var(--primary);
+}
+
+.field-input.error {
+  border-color: var(--error);
+  background: #FEF2F2;
+}
+
+.field-input.error:focus {
+  box-shadow: 0 0 0 4px rgba(239,68,68,0.08);
+}
+
+.field-input.success {
+  border-color: var(--success);
+  background: #F0FDF4;
+}
+
+.field-hint {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.field-error {
+  font-size: 0.72rem;
+  color: var(--error);
+  display: none;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.field-error.show { display: flex; }
+.field-error svg, .field-hint svg { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 2.5; }
+
+/* ─── DOUBLE ROW ─── */
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+@media(max-width: 420px) { .field-row { grid-template-columns: 1fr; } }
+
+/* ─── SUBMIT BUTTON ─── */
+.btn-submit {
+  width: 100%;
+  height: 54px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  border: none;
+  border-radius: 14px;
+  font-family: 'Vazirmatn', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: var(--transition);
+  margin-top: 0.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-submit::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+  opacity: 0;
+  transition: var(--transition);
+}
+
+.btn-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(37,99,235,0.38); }
+.btn-submit:hover::before { opacity: 1; }
+.btn-submit:active { transform: translateY(0); }
+
+.btn-submit svg { width: 20px; height: 20px; stroke: white; fill: none; stroke-width: 2; stroke-linecap: round; }
+
+.btn-submit.loading { pointer-events: none; opacity: 0.8; }
+
+/* ─── DIVIDER ─── */
+.card-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0.5rem 0;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+.card-divider::before,
+.card-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ─── PRIVACY NOTE ─── */
+.privacy-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.75rem 0.9rem;
+  background: rgba(37,99,235,0.05);
+  border: 1px solid rgba(37,99,235,0.12);
+  border-radius: 10px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-top: 0.25rem;
+}
+
+.privacy-note svg { width: 15px; height: 15px; stroke: var(--primary); fill: none; stroke-width: 2; flex-shrink: 0; margin-top: 1px; }
+
+/* ─── OTP SECTION ─── */
+.otp-phone-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, rgba(37,99,235,0.08), rgba(124,58,237,0.08));
+  border: 1px solid rgba(37,99,235,0.15);
+  border-radius: 100px;
+  padding: 0.4rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin: 0 auto 0.25rem;
+  direction: ltr;
+  letter-spacing: 0.03em;
+}
+
+.otp-phone-badge svg { width: 15px; height: 15px; stroke: var(--primary); fill: none; stroke-width: 2; }
+
+.otp-boxes {
+  display: flex;
+  gap: 0.6rem;
+  justify-content: center;
+  direction: ltr;
+  margin: 1.5rem 0;
+}
+
+.otp-input {
+  width: 56px; height: 64px;
+  text-align: center;
+  font-family: 'Vazirmatn', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text);
+  background: var(--bg);
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  outline: none;
+  caret-color: var(--primary);
+  transition: var(--transition);
+  appearance: none;
+  -moz-appearance: textfield;
+}
+
+.otp-input::-webkit-outer-spin-button,
+.otp-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+.otp-input:focus {
+  border-color: var(--primary);
+  background: white;
+  box-shadow: 0 0 0 4px rgba(37,99,235,0.1);
+  transform: translateY(-2px);
+}
+
+.otp-input.filled {
+  border-color: var(--secondary);
+  background: linear-gradient(135deg, rgba(37,99,235,0.04), rgba(124,58,237,0.04));
+}
+
+.otp-input.success-anim {
+  border-color: var(--success);
+  background: #F0FDF4;
+  animation: otpBounce 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+
+@keyframes otpBounce {
+  0% { transform: scale(0.9); }
+  100% { transform: scale(1) translateY(-2px); }
+}
+
+@media(max-width: 360px) {
+  .otp-input { width: 46px; height: 56px; font-size: 1.3rem; border-radius: 11px; }
+  .otp-boxes { gap: 0.4rem; }
+}
+
+.otp-timer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
+.otp-timer svg { width: 15px; height: 15px; stroke: var(--text-muted); fill: none; stroke-width: 2; }
+
+.otp-timer-count {
+  font-weight: 700;
+  color: var(--primary);
+  min-width: 2.2rem;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  direction: ltr;
+}
+
+.otp-resend {
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-family: 'Vazirmatn', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: var(--transition);
+}
+
+.otp-resend:disabled { color: var(--text-muted); text-decoration: none; cursor: default; }
+.otp-resend:not(:disabled):hover { color: var(--primary-dark); }
+
+.otp-status {
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  min-height: 1.2rem;
+  margin-bottom: 0.25rem;
+  transition: var(--transition);
+}
+
+.otp-status.error { color: var(--error); }
+.otp-status.success { color: var(--success); }
+
+.otp-change-phone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  margin-top: 1rem;
+}
+
+.otp-change-phone button {
+  background: none;
+  border: none;
+  font-family: 'Vazirmatn', sans-serif;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: var(--transition);
+  padding: 0.3rem 0.6rem;
+  border-radius: 8px;
+}
+
+.otp-change-phone button:hover { color: var(--primary); background: rgba(37,99,235,0.05); }
+.otp-change-phone button svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+/* ─── SUCCESS PAGE ─── */
+.success-card {
+  text-align: center;
+}
+
+.success-anim-wrap {
+  width: 100px; height: 100px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(34,197,94,0.12), rgba(22,163,74,0.1));
+  border: 2px solid rgba(34,197,94,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.25rem;
+  animation: successPop 0.6s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+
+@keyframes successPop {
+  0% { transform: scale(0); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.success-check {
+  width: 52px; height: 52px;
+  stroke: #16A34A;
+  fill: none;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: drawCheck 0.6s ease 0.3s forwards;
+}
+
+@keyframes drawCheck {
+  to { stroke-dashoffset: 0; }
+}
+
+.success-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+}
+
+.success-title span {
+  background: linear-gradient(135deg, #16A34A, var(--primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.success-sub {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  line-height: 1.7;
+  margin-bottom: 1.75rem;
+  max-width: 340px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.success-info-box {
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 1.1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  text-align: right;
+}
+
+.success-info-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  font-size: 0.82rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.success-info-row:last-child { border-bottom: none; }
+
+.success-info-label {
+  color: var(--text-muted);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.success-info-label svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+.success-info-val {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.success-id-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: linear-gradient(135deg, rgba(37,99,235,0.08), rgba(124,58,237,0.08));
+  border: 1px solid rgba(37,99,235,0.15);
+  border-radius: 10px;
+  padding: 0.5rem 1rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 1.5rem;
+  letter-spacing: 0.04em;
+}
+
+.success-id-badge svg { width: 15px; height: 15px; stroke: var(--primary); fill: none; stroke-width: 2; }
+
+.btn-home {
+  width: 100%;
+  height: 52px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  border: none;
+  border-radius: 14px;
+  font-family: 'Vazirmatn', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: var(--transition);
+  text-decoration: none;
+  margin-bottom: 0.75rem;
+}
+
+.btn-home:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(37,99,235,0.35); }
+.btn-home svg { width: 18px; height: 18px; stroke: white; fill: none; stroke-width: 2; stroke-linecap: round; }
+
+.btn-courses {
+  width: 100%;
+  height: 48px;
+  background: transparent;
+  color: var(--primary);
+  border: 1.5px solid rgba(37,99,235,0.3);
+  border-radius: 14px;
+  font-family: 'Vazirmatn', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: var(--transition);
+  text-decoration: none;
+}
+
+.btn-courses:hover { background: rgba(37,99,235,0.05); border-color: var(--primary); }
+
+/* ─── PAGE TRANSITIONS ─── */
+.page-step {
+  animation: slideIn 0.38s cubic-bezier(0.4,0,0.2,1) both;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.page-step.exit {
+  animation: slideOut 0.28s cubic-bezier(0.4,0,0.2,1) both;
+}
+
+@keyframes slideOut {
+  from { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(20px); }
+}
+
+/* ─── SPINNER ─── */
+.spinner {
+  width: 20px; height: 20px;
+  border: 2.5px solid rgba(255,255,255,0.4);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ─── FLOATING DECORATION ─── */
+.float-deco {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.float-deco svg { width: 14px; height: 14px; stroke: var(--success); fill: none; stroke-width: 2; }
+
+@media(max-height: 700px) { .float-deco { display: none; } }
+</style>
+</head>
+<body>
+
+<!-- BACKGROUND -->
+<div class="page-bg" aria-hidden="true">
+  <div class="bg-blob bg-blob-1"></div>
+  <div class="bg-blob bg-blob-2"></div>
+  <div class="bg-blob bg-blob-3"></div>
+  <div class="bg-grid"></div>
+</div>
+
+<!-- HEADER -->
+<header class="header" role="banner">
+  <a href="index.html" class="logo" aria-label="بازگشت به صفحه اصلی پژوهش‌سرا">
+    <div class="logo-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    </div>
+    <div>
+      <span class="logo-text">پژوهش‌سرا</span>
+      <span class="logo-sub">مرکز علوم و فناوری</span>
+    </div>
+  </a>
+  <a href="index.html" class="header-back" aria-label="بازگشت به صفحه اصلی">
+    <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+    بازگشت
+  </a>
+</header>
+
+<!-- MAIN -->
+<main class="page-wrap" id="main-wrap">
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- STEP 1: REGISTRATION FORM             -->
+  <!-- ══════════════════════════════════════ -->
+  <div class="step-card page-step" id="step-register" role="region" aria-label="فرم ثبت‌نام">
+
+    <!-- Progress steps -->
+    <div class="steps-row" aria-label="مراحل ثبت‌نام">
+      <div class="step-dot">
+        <div class="step-circle active" aria-current="step">۱</div>
+        <span class="step-label active">اطلاعات</span>
+      </div>
+      <div class="step-line" role="separator"></div>
+      <div class="step-dot">
+        <div class="step-circle" aria-label="مرحله ۲: تأیید">۲</div>
+        <span class="step-label">تأیید</span>
+      </div>
+      <div class="step-line" role="separator"></div>
+      <div class="step-dot">
+        <div class="step-circle" aria-label="مرحله ۳: تکمیل">۳</div>
+        <span class="step-label">تکمیل</span>
+      </div>
+    </div>
+
+    <!-- Card head -->
+    <div class="card-head">
+      <div class="card-icon" aria-hidden="true">📋</div>
+      <h1 class="card-title">ثبت‌نام در پژوهش‌سرا</h1>
+      <p class="card-sub">اطلاعات دانش‌آموز را وارد کنید</p>
+    </div>
+
+    <!-- Form -->
+    <form class="form" id="register-form" novalidate aria-label="فرم اطلاعات ثبت‌نام" onsubmit="submitRegister(event)">
+
+      <!-- نام و نام خانوادگی -->
+      <div class="field-row">
+        <div class="field">
+          <label class="field-label" for="first-name">
+            نام
+            <span class="req" aria-label="الزامی">*</span>
+          </label>
+          <div class="field-wrap">
+            <input
+              class="field-input"
+              type="text"
+              id="first-name"
+              name="first_name"
+              placeholder="علی"
+              autocomplete="given-name"
+              required
+              aria-required="true"
+              aria-describedby="first-name-error"
+              oninput="clearError(this)"
+            >
+            <svg class="field-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <span class="field-error" id="first-name-error" role="alert">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            نام را وارد کنید
+          </span>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="last-name">
+            نام خانوادگی
+            <span class="req" aria-label="الزامی">*</span>
+          </label>
+          <div class="field-wrap">
+            <input
+              class="field-input"
+              type="text"
+              id="last-name"
+              name="last_name"
+              placeholder="محمدی"
+              autocomplete="family-name"
+              required
+              aria-required="true"
+              aria-describedby="last-name-error"
+              oninput="clearError(this)"
+            >
+            <svg class="field-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <span class="field-error" id="last-name-error" role="alert">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            نام خانوادگی را وارد کنید
+          </span>
+        </div>
+      </div>
+
+      <!-- نام پدر -->
+      <div class="field">
+        <label class="field-label" for="father-name">
+          نام پدر
+          <span class="req" aria-label="الزامی">*</span>
+        </label>
+        <div class="field-wrap">
+          <input
+            class="field-input"
+            type="text"
+            id="father-name"
+            name="father_name"
+            placeholder="حسین"
+            autocomplete="off"
+            required
+            aria-required="true"
+            aria-describedby="father-name-error"
+            oninput="clearError(this)"
+          >
+          <svg class="field-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <span class="field-error" id="father-name-error" role="alert">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            نام پدر را وارد کنید
+          </span>
+      </div>
+
+      <!-- کد ملی -->
+      <div class="field">
+        <label class="field-label" for="national-id">
+          کد ملی
+          <span class="req" aria-label="الزامی">*</span>
+        </label>
+        <div class="field-wrap">
+          <input
+            class="field-input"
+            type="text"
+            id="national-id"
+            name="national_id"
+            placeholder="۰۰۱۲۳۴۵۶۷۸"
+            maxlength="10"
+            inputmode="numeric"
+            autocomplete="off"
+            required
+            aria-required="true"
+            aria-describedby="national-id-hint national-id-error"
+            oninput="onNationalIdInput(this)"
+          >
+          <svg class="field-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+        </div>
+        <span class="field-hint" id="national-id-hint">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          ۱۰ رقم بدون خط تیره
+        </span>
+        <span class="field-error" id="national-id-error" role="alert">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          کد ملی باید ۱۰ رقم باشد
+        </span>
+      </div>
+
+      <!-- شماره تلفن -->
+      <div class="field">
+        <label class="field-label" for="phone">
+          شماره موبایل
+          <span class="req" aria-label="الزامی">*</span>
+        </label>
+        <div class="field-wrap">
+          <input
+            class="field-input"
+            type="tel"
+            id="phone"
+            name="phone"
+            placeholder="۰۹۱۲۳۴۵۶۷۸۹"
+            maxlength="11"
+            inputmode="numeric"
+            autocomplete="tel"
+            required
+            aria-required="true"
+            aria-describedby="phone-hint phone-error"
+            oninput="onPhoneInput(this)"
+            style="direction:ltr; text-align:right; letter-spacing:0.05em"
+          >
+          <svg class="field-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.83a16 16 0 0 0 6.29 6.29l.84-.84a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        </div>
+        <span class="field-hint" id="phone-hint">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          کد OTP به این شماره ارسال می‌شود
+        </span>
+        <span class="field-error" id="phone-error" role="alert">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          شماره موبایل معتبر نیست (مثلاً ۰۹۱۲۱۲۳۴۵۶۷)
+        </span>
+      </div>
+
+      <!-- Privacy note -->
+      <div class="privacy-note" role="note">
+        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        اطلاعات شما کاملاً محرمانه است و فقط برای ثبت‌نام در پژوهش‌سرا استفاده می‌شود.
+      </div>
+
+      <!-- Submit -->
+      <button type="submit" class="btn-submit" id="register-btn">
+        <span id="register-btn-text">ارسال کد تأیید</span>
+        <svg viewBox="0 0 24 24" id="register-btn-icon"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+
+    </form>
+  </div>
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- STEP 2: OTP VERIFICATION              -->
+  <!-- ══════════════════════════════════════ -->
+  <div class="step-card page-step" id="step-otp" style="display:none" role="region" aria-label="تأیید کد OTP" aria-live="polite">
+
+    <!-- Progress steps -->
+    <div class="steps-row" aria-label="مراحل ثبت‌نام">
+      <div class="step-dot">
+        <div class="step-circle done" aria-label="مرحله ۱ تکمیل شد">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <span class="step-label done">اطلاعات</span>
+      </div>
+      <div class="step-line done" role="separator"></div>
+      <div class="step-dot">
+        <div class="step-circle active" aria-current="step">۲</div>
+        <span class="step-label active">تأیید</span>
+      </div>
+      <div class="step-line" role="separator"></div>
+      <div class="step-dot">
+        <div class="step-circle" aria-label="مرحله ۳: تکمیل">۳</div>
+        <span class="step-label">تکمیل</span>
+      </div>
+    </div>
+
+    <!-- Card head -->
+    <div class="card-head">
+      <div class="card-icon" aria-hidden="true">📱</div>
+      <h2 class="card-title">تأیید شماره موبایل</h2>
+      <p class="card-sub">کد ۶ رقمی ارسال شده به شماره زیر را وارد کنید</p>
+      <div class="otp-phone-badge" id="otp-phone-display" aria-live="polite">
+        <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.83a16 16 0 0 0 6.29 6.29l.84-.84a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        <span id="otp-phone-num">۰۹۱۲ ۱۲۳ ۴۵۶۷</span>
+      </div>
+    </div>
+
+    <!-- OTP boxes -->
+    <div class="otp-boxes" role="group" aria-label="کد تأیید شش رقمی">
+      <input class="otp-input" type="number" maxlength="1" inputmode="numeric" aria-label="رقم ۶" id="otp-6" oninput="otpInput(this,5)" onkeydown="otpKey(event,this,5)">
+      <input class="otp-input" type="number" maxlength="1" inputmode="numeric" aria-label="رقم ۵" id="otp-5" oninput="otpInput(this,4)" onkeydown="otpKey(event,this,4)">
+      <input class="otp-input" type="number" maxlength="1" inputmode="numeric" aria-label="رقم ۴" id="otp-4" oninput="otpInput(this,3)" onkeydown="otpKey(event,this,3)">
+      <input class="otp-input" type="number" maxlength="1" inputmode="numeric" aria-label="رقم ۳" id="otp-3" oninput="otpInput(this,2)" onkeydown="otpKey(event,this,2)">
+      <input class="otp-input" type="number" maxlength="1" inputmode="numeric" aria-label="رقم ۲" id="otp-2" oninput="otpInput(this,1)" onkeydown="otpKey(event,this,1)">
+      <input class="otp-input" type="number" maxlength="1" inputmode="numeric" aria-label="رقم ۱" id="otp-1" oninput="otpInput(this,0)" onkeydown="otpKey(event,this,0)" autofocus>
+    </div>
+
+    <!-- Status message -->
+    <div class="otp-status" id="otp-status" role="alert" aria-live="assertive"></div>
+
+    <!-- Timer + resend -->
+    <div class="otp-timer" aria-live="polite">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <span>ارسال مجدد کد تا</span>
+      <span class="otp-timer-count" id="otp-countdown">۱:۳۰</span>
+      <button class="otp-resend" id="otp-resend-btn" disabled onclick="resendOtp()" aria-label="ارسال مجدد کد تأیید">ارسال مجدد</button>
+    </div>
+
+    <!-- Verify button -->
+    <button class="btn-submit" id="otp-btn" onclick="verifyOtp()" disabled>
+      <span id="otp-btn-text">تأیید و ادامه</span>
+      <svg viewBox="0 0 24 24" id="otp-btn-icon"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+
+    <!-- Change phone -->
+    <div class="otp-change-phone">
+      <span style="font-size:0.75rem;color:var(--text-muted)">شماره اشتباه است؟</span>
+      <button onclick="goBack()" aria-label="تغییر شماره موبایل">
+        <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+        ویرایش اطلاعات
+      </button>
+    </div>
+
+  </div>
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- STEP 3: SUCCESS                       -->
+  <!-- ══════════════════════════════════════ -->
+  <div class="step-card page-step success-card" id="step-success" style="display:none" role="region" aria-label="ثبت‌نام موفق" aria-live="polite">
+
+    <!-- Progress steps -->
+    <div class="steps-row" aria-label="مراحل ثبت‌نام">
+      <div class="step-dot">
+        <div class="step-circle done" aria-label="مرحله ۱ تکمیل شد">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <span class="step-label done">اطلاعات</span>
+      </div>
+      <div class="step-line done" role="separator"></div>
+      <div class="step-dot">
+        <div class="step-circle done" aria-label="مرحله ۲ تکمیل شد">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <span class="step-label done">تأیید</span>
+      </div>
+      <div class="step-line done" role="separator"></div>
+      <div class="step-dot">
+        <div class="step-circle done" aria-current="step" aria-label="مرحله ۳ تکمیل شد">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <span class="step-label done">تکمیل</span>
+      </div>
+    </div>
+
+    <!-- Animated check -->
+    <div class="success-anim-wrap" role="img" aria-label="ثبت‌نام موفقیت‌آمیز">
+      <svg class="success-check" viewBox="0 0 52 52" aria-hidden="true">
+        <circle cx="26" cy="26" r="24" fill="none" stroke="#86efac" stroke-width="1.5" opacity="0.5"/>
+        <polyline points="14 26 22 34 38 18" fill="none"/>
+      </svg>
+    </div>
+
+    <h2 class="success-title">
+      ثبت‌نام <span>موفق بود!</span>
+    </h2>
+    <p class="success-sub">
+      ثبت‌نام شما با موفقیت انجام شد. مشاوران پژوهش‌سرا به زودی با شما تماس خواهند گرفت.
+    </p>
+
+    <!-- Registration ID -->
+    <div class="success-id-badge" aria-label="کد پیگیری ثبت‌نام">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      کد پیگیری:&nbsp;<span id="tracking-code">PS-1403-8472</span>
+    </div>
+
+    <!-- Summary info -->
+    <div class="success-info-box" aria-label="اطلاعات ثبت‌نام">
+      <div class="success-info-row">
+        <span class="success-info-label">
+          <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          نام و نام خانوادگی
+        </span>
+        <span class="success-info-val" id="summary-name">علی محمدی</span>
+      </div>
+      <div class="success-info-row">
+        <span class="success-info-label">
+          <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.83a16 16 0 0 0 6.29 6.29l.84-.84a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          شماره موبایل
+        </span>
+        <span class="success-info-val" id="summary-phone" style="direction:ltr">۰۹۱۲۱۲۳۴۵۶۷</span>
+      </div>
+      <div class="success-info-row">
+        <span class="success-info-label">
+          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          تاریخ ثبت‌نام
+        </span>
+        <span class="success-info-val" id="summary-date">۱۵ خرداد ۱۴۰۳</span>
+      </div>
+    </div>
+
+    <!-- CTA buttons -->
+    <a href="index.html" class="btn-home">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      بازگشت به صفحه اصلی
+    </a>
+    <a href="index.html#courses" class="btn-courses">
+      <svg viewBox="0 0 24 24" width="17" height="17" stroke="currentColor" fill="none" stroke-width="2" style="flex-shrink:0"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+      مشاهده دوره‌ها
+    </a>
+
+  </div>
+
+</main>
+
+<!-- SECURE BADGE -->
+<div class="float-deco" aria-label="اتصال امن">
+  <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+  اتصال امن و رمزنگاری شده
+</div>
+
+<script>
+/* ════════════════════════════════════════════════════
+   FORM DATA STORE
+════════════════════════════════════════════════════ */
+const formData = {};
+let otpTimerInterval = null;
+let otpSeconds = 90;
+const OTP_INPUTS = ['otp-1','otp-2','otp-3','otp-4','otp-5','otp-6'];
+
+/* ════════════════════════════════════════════════════
+   STEP NAVIGATION
+════════════════════════════════════════════════════ */
+function showStep(stepId) {
+  const steps = ['step-register','step-otp','step-success'];
+  steps.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+  const next = document.getElementById(stepId);
+  if (next) {
+    next.style.display = 'block';
+    next.classList.remove('page-step');
+    void next.offsetWidth;
+    next.classList.add('page-step');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Focus first interactive element for accessibility
+    const first = next.querySelector('input, button, a');
+    if (first) setTimeout(() => first.focus(), 100);
+  }
+}
+
+/* ════════════════════════════════════════════════════
+   INPUT HELPERS
+════════════════════════════════════════════════════ */
+function clearError(el) {
+  el.classList.remove('error');
+  const errId = el.id + '-error';
+  const err = document.getElementById(errId);
+  if (err) err.classList.remove('show');
+}
+
+function showError(inputId, message) {
+  const input = document.getElementById(inputId);
+  const err = document.getElementById(inputId + '-error');
+  if (input) input.classList.add('error');
+  if (err) {
+    if (message) err.lastChild.textContent = ' ' + message;
+    err.classList.add('show');
+  }
+}
+
+function toEnDigits(str) {
+  return str.replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
+}
+
+function toPersianDigits(str) {
+  return String(str).replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+}
+
+function onNationalIdInput(el) {
+  let v = toEnDigits(el.value).replace(/\D/g, '').slice(0, 10);
+  el.value = v;
+  clearError(el);
+  if (v.length === 10) el.classList.add('success');
+  else el.classList.remove('success');
+}
+
+function onPhoneInput(el) {
+  let v = toEnDigits(el.value).replace(/\D/g, '').slice(0, 11);
+  el.value = v;
+  clearError(el);
+  if (v.length === 11 && v.startsWith('09')) el.classList.add('success');
+  else el.classList.remove('success');
+}
+
+/* ════════════════════════════════════════════════════
+   VALIDATE + SUBMIT REGISTER FORM
+════════════════════════════════════════════════════ */
+function submitRegister(e) {
+  e.preventDefault();
+  let valid = true;
+
+  const firstName = document.getElementById('first-name').value.trim();
+  const lastName = document.getElementById('last-name').value.trim();
+  const fatherName = document.getElementById('father-name').value.trim();
+  const nationalId = toEnDigits(document.getElementById('national-id').value.trim());
+  const phone = toEnDigits(document.getElementById('phone').value.trim());
+
+  if (!firstName) { showError('first-name', 'نام را وارد کنید'); valid = false; }
+  if (!lastName) { showError('last-name', 'نام خانوادگی را وارد کنید'); valid = false; }
+  if (!fatherName) { showError('father-name', 'نام پدر را وارد کنید'); valid = false; }
+
+  if (!nationalId || nationalId.length !== 10 || !/^\d{10}$/.test(nationalId)) {
+    showError('national-id', 'کد ملی باید ۱۰ رقم باشد'); valid = false;
+  }
+
+  if (!phone || phone.length !== 11 || !phone.startsWith('09')) {
+    showError('phone', 'شماره موبایل معتبر نیست (مثلاً ۰۹۱۲۱۲۳۴۵۶۷)'); valid = false;
+  }
+
+  if (!valid) {
+    // Shake the button
+    const btn = document.getElementById('register-btn');
+    btn.style.animation = 'none';
+    void btn.offsetWidth;
+    btn.style.animation = 'shake 0.4s ease';
+    return;
+  }
+
+  // Store data
+  formData.firstName = firstName;
+  formData.lastName = lastName;
+  formData.fatherName = fatherName;
+  formData.nationalId = nationalId;
+  formData.phone = phone;
+
+  // Loading state
+  const btn = document.getElementById('register-btn');
+  const btnText = document.getElementById('register-btn-text');
+  const btnIcon = document.getElementById('register-btn-icon');
+  btn.classList.add('loading');
+  btnText.textContent = 'در حال ارسال...';
+  btnIcon.style.display = 'none';
+  btn.insertAdjacentHTML('beforeend', '<div class="spinner" id="reg-spinner"></div>');
+
+  // Simulate API call
+  setTimeout(() => {
+    btn.classList.remove('loading');
+    btnText.textContent = 'ارسال کد تأیید';
+    btnIcon.style.display = '';
+    const sp = document.getElementById('reg-spinner');
+    if (sp) sp.remove();
+    goToOtp();
+  }, 1200);
+}
+
+/* ════════════════════════════════════════════════════
+   OTP STEP
+════════════════════════════════════════════════════ */
+function goToOtp() {
+  // Update phone display
+  const ph = formData.phone;
+  const masked = ph.slice(0,4) + '****' + ph.slice(-3);
+  document.getElementById('otp-phone-num').textContent = toPersianDigits(masked);
+  showStep('step-otp');
+  startOtpTimer();
+  // Auto-focus first box
+  setTimeout(() => document.getElementById('otp-1').focus(), 200);
+}
+
+function goBack() {
+  clearOtpInputs();
+  stopOtpTimer();
+  showStep('step-register');
+}
+
+/* ─── OTP Timer ─── */
+function startOtpTimer() {
+  stopOtpTimer();
+  otpSeconds = 90;
+  updateTimerDisplay();
+  document.getElementById('otp-resend-btn').disabled = true;
+  otpTimerInterval = setInterval(() => {
+    otpSeconds--;
+    updateTimerDisplay();
+    if (otpSeconds <= 0) {
+      stopOtpTimer();
+      document.getElementById('otp-resend-btn').disabled = false;
+      document.getElementById('otp-countdown').textContent = '۰:۰۰';
+    }
+  }, 1000);
+}
+
+function stopOtpTimer() {
+  if (otpTimerInterval) { clearInterval(otpTimerInterval); otpTimerInterval = null; }
+}
+
+function updateTimerDisplay() {
+  const m = Math.floor(otpSeconds / 60);
+  const s = otpSeconds % 60;
+  const display = toPersianDigits(m + ':' + String(s).padStart(2,'0'));
+  document.getElementById('otp-countdown').textContent = display;
+}
+
+function resendOtp() {
+  clearOtpInputs();
+  setOtpStatus('', '');
+  document.getElementById('otp-resend-btn').disabled = true;
+  startOtpTimer();
+  // Flash the phone badge
+  const badge = document.getElementById('otp-phone-display');
+  badge.style.transform = 'scale(1.04)';
+  setTimeout(() => badge.style.transform = '', 300);
+}
+
+/* ─── OTP Input Navigation ─── */
+const otpInputEls = () => OTP_INPUTS.map(id => document.getElementById(id));
+
+function otpInput(el, idx) {
+  // Keep only single digit
+  let v = el.value.replace(/\D/g, '');
+  if (v.length > 1) v = v[v.length - 1];
+  el.value = v;
+
+  if (v) {
+    el.classList.add('filled');
+    // Move to next (left = lower index in RTL display, but DOM order goes 1→6)
+    const next = document.getElementById('otp-' + (idx + 2));
+    if (next) next.focus();
+  } else {
+    el.classList.remove('filled');
+  }
+
+  checkOtpComplete();
+}
+
+function otpKey(e, el, idx) {
+  if (e.key === 'Backspace' && !el.value) {
+    const prev = document.getElementById('otp-' + idx);
+    if (prev) { prev.value = ''; prev.classList.remove('filled'); prev.focus(); }
+  }
+  // Allow paste
+  if (e.key === 'v' && (e.ctrlKey || e.metaKey)) return;
+}
+
+// Handle paste on any OTP input
+OTP_INPUTS.forEach((id, i) => {
+  window.addEventListener('DOMContentLoaded', () => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('paste', (ev) => {
+      ev.preventDefault();
+      const pasted = (ev.clipboardData || window.clipboardData).getData('text').replace(/\D/g,'').slice(0,6);
+      OTP_INPUTS.forEach((bid, bi) => {
+        const box = document.getElementById(bid);
+        if (box) {
+          const ch = pasted[bi] || '';
+          box.value = ch;
+          if (ch) box.classList.add('filled'); else box.classList.remove('filled');
+        }
+      });
+      checkOtpComplete();
+      const last = document.getElementById('otp-' + Math.min(pasted.length, 6));
+      if (last) last.focus();
+    });
+  });
+});
+
+function checkOtpComplete() {
+  const vals = OTP_INPUTS.map(id => document.getElementById(id)?.value || '');
+  const complete = vals.every(v => v.length === 1);
+  document.getElementById('otp-btn').disabled = !complete;
+}
+
+function clearOtpInputs() {
+  OTP_INPUTS.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.value = ''; el.classList.remove('filled', 'success-anim', 'error'); }
+  });
+  document.getElementById('otp-btn').disabled = true;
+  setOtpStatus('', '');
+}
+
+function setOtpStatus(msg, type) {
+  const el = document.getElementById('otp-status');
+  el.textContent = msg;
+  el.className = 'otp-status' + (type ? ' ' + type : '');
+}
+
+/* ─── Verify OTP ─── */
+function verifyOtp() {
+  const code = OTP_INPUTS.map(id => document.getElementById(id)?.value || '').join('');
+
+  const btn = document.getElementById('otp-btn');
+  const btnText = document.getElementById('otp-btn-text');
+  const btnIcon = document.getElementById('otp-btn-icon');
+  btn.classList.add('loading');
+  btn.disabled = true;
+  btnText.textContent = 'در حال تأیید...';
+  btnIcon.style.display = 'none';
+  btn.insertAdjacentHTML('beforeend', '<div class="spinner" id="otp-spinner"></div>');
+
+  setOtpStatus('', '');
+
+  setTimeout(() => {
+    btn.classList.remove('loading');
+    btnText.textContent = 'تأیید و ادامه';
+    btnIcon.style.display = '';
+    const sp = document.getElementById('otp-spinner');
+    if (sp) sp.remove();
+
+    // Demo: code "123456" fails, everything else succeeds
+    if (code === '000000') {
+      setOtpStatus('کد وارد شده اشتباه است. دوباره تلاش کنید.', 'error');
+      OTP_INPUTS.forEach(id => document.getElementById(id)?.classList.add('error'));
+      setTimeout(() => OTP_INPUTS.forEach(id => {
+        const el = document.getElementById(id);
+        if(el) { el.classList.remove('error'); el.value = ''; el.classList.remove('filled'); }
+      }), 1400);
+      document.getElementById('otp-1').focus();
+      btn.disabled = false;
+    } else {
+      // Success animation on boxes
+      OTP_INPUTS.forEach((id, i) => {
+        setTimeout(() => {
+          const el = document.getElementById(id);
+          if (el) { el.classList.remove('filled'); el.classList.add('success-anim'); }
+        }, i * 60);
+      });
+      setOtpStatus('کد تأیید شد!', 'success');
+      stopOtpTimer();
+      setTimeout(() => goToSuccess(), 900);
+    }
+  }, 1500);
+}
+
+/* ════════════════════════════════════════════════════
+   SUCCESS STEP
+════════════════════════════════════════════════════ */
+function goToSuccess() {
+  // Fill summary
+  document.getElementById('summary-name').textContent =
+    formData.firstName + ' ' + formData.lastName;
+  document.getElementById('summary-phone').textContent =
+    toPersianDigits(formData.phone);
+
+  // Generate tracking code
+  const code = 'PS-1403-' + Math.floor(1000 + Math.random() * 9000);
+  document.getElementById('tracking-code').textContent = code;
+
+  // Today's date in Persian
+  try {
+    const d = new Date();
+    const jdate = new Intl.DateTimeFormat('fa-IR', { year:'numeric', month:'long', day:'numeric' }).format(d);
+    document.getElementById('summary-date').textContent = jdate;
+  } catch(e) {}
+
+  showStep('step-success');
+}
+
+/* ════════════════════════════════════════════════════
+   CSS SHAKE KEYFRAME (injected)
+════════════════════════════════════════════════════ */
+const shakeStyle = document.createElement('style');
+shakeStyle.textContent = `
+  @keyframes shake {
+    0%,100%{transform:translateX(0)}
+    20%{transform:translateX(-6px)}
+    40%{transform:translateX(6px)}
+    60%{transform:translateX(-4px)}
+    80%{transform:translateX(4px)}
+  }
+`;
+document.head.appendChild(shakeStyle);
+</script>
+</body>
+</html>

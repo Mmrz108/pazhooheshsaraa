@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="دوره‌های آموزشی پژوهش‌سرا">
+<title>دوره‌ها | پژوهش‌سرا</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --primary: #2563EB; --secondary: #7C3AED; --bg: #F8FAFC;
+    --text: #0F172A; --text-muted: #64748B; --border: #E2E8F0;
+    --card-radius: 16px; --transition: all 0.3s ease;
+  }
+  body { font-family: 'Vazirmatn', sans-serif; background: var(--bg); color: var(--text); direction: rtl; }
+  .header {
+    position: fixed; top: 0; right: 0; left: 0; z-index: 100;
+    background: rgba(255,255,255,0.92); backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border); height: 64px;
+    display: flex; align-items: center; justify-content: space-between; padding: 0 1.25rem;
+  }
+  .logo { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: inherit; }
+  .logo-img { width: 42px; height: 42px; border-radius: 10px; object-fit: cover; }
+  .logo-text { font-size: 1.1rem; font-weight: 700; display: block; line-height: 1.2; }
+  .logo-sub { font-size: 0.65rem; color: var(--text-muted); display: block; }
+  .scroll-nav {
+    position: sticky; top: 64px; z-index: 90; background: #fff;
+    border-bottom: 1px solid var(--border); overflow-x: auto; white-space: nowrap; padding: 0 1rem;
+  }
+  .scroll-nav-inner { display: inline-flex; }
+  .scroll-nav a {
+    padding: 0.85rem 1rem; font-size: 0.8rem; font-weight: 500;
+    color: var(--text-muted); text-decoration: none;
+    border-bottom: 2.5px solid transparent; transition: var(--transition);
+  }
+  .scroll-nav a:hover, .scroll-nav a.active { color: var(--primary); border-bottom-color: var(--primary); }
+  .page-main { padding: 7.5rem 1.25rem 3rem; max-width: 1200px; margin: 0 auto; }
+  .breadcrumb { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.75rem; }
+  .breadcrumb a { color: var(--primary); text-decoration: none; }
+  .page-title { font-size: clamp(1.8rem, 5vw, 2.6rem); font-weight: 800; margin-bottom: 0.75rem; }
+  .page-desc { color: var(--text-muted); line-height: 1.8; max-width: 720px; margin-bottom: 2rem; }
+  .category-courses-grid {
+    display: grid; grid-template-columns: 1fr; gap: 1rem;
+  }
+  @media (min-width: 640px) { .category-courses-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 900px) { .category-courses-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (min-width: 1100px) { .category-courses-grid { grid-template-columns: repeat(4, 1fr); } }
+  .course-card {
+    background: #fff; border-radius: var(--card-radius); border: 1.5px solid var(--border);
+    overflow: hidden; display: flex; flex-direction: column; transition: var(--transition);
+  }
+  .course-card:hover { transform: translateY(-4px); box-shadow: 0 12px 36px rgba(0,0,0,0.08); }
+  .course-thumb { width: 100%; aspect-ratio: 16/9; object-fit: cover; }
+  .course-thumb-placeholder {
+    width: 100%; aspect-ratio: 16/9; display: flex; align-items: center;
+    justify-content: center; font-size: 2.5rem; background: linear-gradient(135deg,#EFF6FF,#EDE9FE);
+  }
+  .course-body { padding: 1rem; flex: 1; display: flex; flex-direction: column; gap: 0.5rem; }
+  .course-meta { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+  .badge { padding: 0.2rem 0.6rem; border-radius: 100px; font-size: 0.7rem; font-weight: 600; }
+  .badge-blue { background: #EFF6FF; color: #1D4ED8; }
+  .badge-green { background: #F0FDF4; color: #15803D; }
+  .badge-purple { background: #F5F3FF; color: #6D28D9; }
+  .badge-cyan { background: #ECFEFF; color: #0E7490; }
+  .badge-amber { background: #FFFBEB; color: #B45309; }
+  .course-title { font-size: 0.95rem; font-weight: 700; line-height: 1.5; }
+  .course-info { display: flex; gap: 0.75rem; font-size: 0.75rem; color: var(--text-muted); margin-top: auto; }
+  .btn-course {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: #fff; border: none; border-radius: 10px; padding: 0.65rem 1rem;
+    font-family: inherit; font-size: 0.82rem; font-weight: 600; cursor: pointer; margin-top: 0.5rem;
+  }
+  .btn-course:disabled { opacity: 0.6; cursor: not-allowed; }
+  .empty-state, .loading-state { text-align: center; padding: 3rem 1rem; color: var(--text-muted); grid-column: 1 / -1; }
+  .fade-up { opacity: 0; transform: translateY(20px); transition: opacity 0.5s, transform 0.5s; }
+  .fade-up.visible { opacity: 1; transform: translateY(0); }
+  .footer-mini {
+    text-align: center; padding: 2rem 1rem; color: var(--text-muted); font-size: 0.8rem;
+    border-top: 1px solid var(--border); margin-top: 3rem;
+  }
+  .footer-mini a { color: var(--primary); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <a href="/" class="logo" data-site-logo>
+    <img class="logo-img" src="/images/logo.jpg" alt="پژوهش‌سرا" width="42" height="42">
+    <div>
+      <span class="logo-text">پژوهش‌سرا</span>
+      <span class="logo-sub">مرکز علوم و فناوری</span>
+    </div>
+  </a>
+</header>
+
+<nav class="scroll-nav" aria-label="دسته‌بندی دوره‌ها">
+  <div class="scroll-nav-inner" data-site-nav></div>
+</nav>
+
+<main class="page-main">
+  <nav class="breadcrumb" aria-label="مسیر">
+    <a href="/">صفحه اصلی</a> › <span data-category-breadcrumb>دوره‌ها</span>
+  </nav>
+  <h1 class="page-title" data-category-title>دوره‌های آموزشی</h1>
+  <p class="page-desc" data-category-desc>در حال بارگذاری...</p>
+  <div class="category-courses-grid" data-category-courses role="list">
+    <div class="loading-state">در حال بارگذاری دوره‌ها...</div>
+  </div>
+</main>
+
+<footer class="footer-mini">
+  <a href="/">بازگشت به صفحه اصلی</a> · تمامی حقوق برای پژوهشسرا دانش آموزی شهید حجتی (نجف آباد) محفوظ می‌باشد.
+</footer>
+
+<script src="/js/api.js"></script>
+<script src="/js/utils.js"></script>
+<script src="/js/components.js"></script>
+<script src="/js/app.js"></script>
+</body>
+</html>

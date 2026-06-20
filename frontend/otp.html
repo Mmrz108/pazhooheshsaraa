@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تأیید کد | پژوهش‌سرا</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --primary: #2563EB;
+  --primary-dark: #1D4ED8;
+  --secondary: #7C3AED;
+  --accent: #06B6D4;
+  --bg: #F8FAFC;
+  --text: #0F172A;
+  --text-muted: #64748B;
+  --border: #E2E8F0;
+  --error: #EF4444;
+  --success: #22C55E;
+  --white: #ffffff;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Vazirmatn', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  direction: rtl;
+  min-height: 100svh;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ─── BACKGROUND ─── */
+.page-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.bg-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.11;
+}
+
+.bg-blob-1 {
+  width: 560px; height: 560px;
+  background: var(--primary);
+  top: -180px; right: -120px;
+}
+
+.bg-blob-2 {
+  width: 480px; height: 480px;
+  background: var(--secondary);
+  bottom: -140px; left: -80px;
+}
+
+.bg-blob-3 {
+  width: 260px; height: 260px;
+  background: var(--accent);
+  top: 45%; left: 42%;
+  opacity: 0.06;
+}
+
+.bg-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(37,99,235,0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(37,99,235,0.035) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+/* ─── HEADER ─── */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.5rem;
+  background: rgba(255,255,255,0.82);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(226,232,240,0.6);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+}
+
+.logo-icon {
+  width: 38px; height: 38px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.logo-icon svg { width: 22px; height: 22px; fill: white; }
+.logo-text { font-size: 1.05rem; font-weight: 700; color: var(--text); line-height: 1.2; }
+.logo-sub { font-size: 0.62rem; color: var(--text-muted); font-weight: 400; display: block; }
+
+.header-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 500;
+  text-decoration: none;
+  padding: 0.45rem 0.9rem;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  transition: var(--transition);
+}
+
+.header-back:hover {
+  color: var(--primary);
+  border-color: var(--primary);
+  background: rgba(37,99,235,0.04);
+}
+
+.header-back svg {
+  width: 16px; height: 16px;
+  stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round;
+}
+
+/* ─── LAYOUT ─── */
+.page-wrap {
+  position: relative;
+  z-index: 1;
+  min-height: calc(100svh - 64px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.25rem;
+}
+
+/* ─── CARD ─── */
+.card {
+  width: 100%;
+  max-width: 480px;
+  background: rgba(255,255,255,0.93);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(226,232,240,0.75);
+  border-radius: 22px;
+  box-shadow:
+    0 4px 6px rgba(0,0,0,0.02),
+    0 24px 64px rgba(15,23,42,0.09);
+  padding: 2.5rem 2.25rem;
+  animation: cardIn 0.45s cubic-bezier(0.34,1.2,0.64,1) both;
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(28px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media(max-width: 500px) {
+  .card { padding: 2rem 1.35rem; border-radius: 18px; }
+}
+
+/* ─── STEP INDICATOR ─── */
+.steps-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2.25rem;
+}
+
+.step-dot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.step-circle {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.82rem;
+  font-weight: 700;
+  border: 2px solid var(--border);
+  color: var(--text-muted);
+  background: white;
+  transition: var(--transition);
+  position: relative;
+  z-index: 1;
+}
+
+.step-circle.done {
+  background: linear-gradient(135deg, #22C55E, #16A34A);
+  border-color: transparent;
+  color: white;
+  box-shadow: 0 3px 14px rgba(34,197,94,0.3);
+}
+
+.step-circle.active {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  border-color: transparent;
+  color: white;
+  box-shadow: 0 3px 16px rgba(37,99,235,0.35);
+}
+
+.step-circle svg { width: 17px; height: 17px; stroke: white; fill: none; stroke-width: 2.5; }
+
+.step-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.step-label.done  { color: #16A34A; }
+.step-label.active { color: var(--primary); }
+
+.step-line {
+  flex: 1;
+  height: 2.5px;
+  border-radius: 2px;
+  margin: 0 0.55rem;
+  margin-bottom: 1.6rem;
+  min-width: 44px;
+  transition: var(--transition);
+  background: var(--border);
+}
+
+.step-line.done {
+  background: linear-gradient(90deg, #22C55E, var(--primary));
+}
+
+/* ─── PHONE ICON ANIMATION ─── */
+.phone-icon-wrap {
+  width: 80px; height: 80px;
+  border-radius: 22px;
+  background: linear-gradient(135deg, rgba(37,99,235,0.09), rgba(124,58,237,0.09));
+  border: 1.5px solid rgba(37,99,235,0.14);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.25rem;
+  position: relative;
+  animation: iconFloat 3s ease-in-out infinite;
+}
+
+@keyframes iconFloat {
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(-5px); }
+}
+
+.phone-icon-wrap svg {
+  width: 36px; height: 36px;
+  stroke: url(#iconGrad);
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+}
+
+/* Signal rings */
+.phone-icon-wrap::before,
+.phone-icon-wrap::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  border: 1.5px solid rgba(37,99,235,0.22);
+  animation: ripple 2.4s ease-out infinite;
+}
+
+.phone-icon-wrap::before {
+  width: 100px; height: 100px;
+  animation-delay: 0s;
+}
+
+.phone-icon-wrap::after {
+  width: 130px; height: 130px;
+  animation-delay: 0.7s;
+}
+
+@keyframes ripple {
+  0%   { transform: scale(0.75); opacity: 0.7; }
+  100% { transform: scale(1.25); opacity: 0; }
+}
+
+/* ─── CARD HEAD ─── */
+.card-title {
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: var(--text);
+  text-align: center;
+  margin-bottom: 0.4rem;
+  line-height: 1.25;
+}
+
+.card-sub {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  text-align: center;
+  line-height: 1.65;
+  margin-bottom: 1.1rem;
+}
+
+/* ─── PHONE BADGE ─── */
+.phone-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 0 auto 0.5rem;
+  padding: 0.5rem 1.25rem;
+  background: linear-gradient(135deg, rgba(37,99,235,0.07), rgba(124,58,237,0.07));
+  border: 1.5px solid rgba(37,99,235,0.14);
+  border-radius: 100px;
+  width: fit-content;
+}
+
+.phone-badge svg {
+  width: 15px; height: 15px;
+  stroke: var(--primary); fill: none; stroke-width: 2;
+  flex-shrink: 0;
+}
+
+.phone-badge-num {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  direction: ltr;
+  letter-spacing: 0.07em;
+  font-variant-numeric: tabular-nums;
+}
+
+.phone-change {
+  display: block;
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-bottom: 1.75rem;
+}
+
+.phone-change a {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+  border-bottom: 1px dashed rgba(37,99,235,0.4);
+  transition: var(--transition);
+}
+
+.phone-change a:hover { border-bottom-color: var(--primary); }
+
+/* ─── OTP BOXES ─── */
+.otp-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text);
+  text-align: center;
+  margin-bottom: 0.8rem;
+}
+
+.otp-boxes {
+  display: flex;
+  gap: 0.65rem;
+  justify-content: center;
+  direction: ltr;
+  margin-bottom: 0.75rem;
+}
+
+.otp-box {
+  position: relative;
+  flex: 1;
+  max-width: 60px;
+}
+
+.otp-input {
+  width: 100%;
+  height: 66px;
+  text-align: center;
+  font-family: 'Vazirmatn', sans-serif;
+  font-size: 1.65rem;
+  font-weight: 700;
+  color: var(--text);
+  background: var(--bg);
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  outline: none;
+  caret-color: var(--primary);
+  transition: var(--transition);
+  -moz-appearance: textfield;
+  appearance: textfield;
+  display: block;
+}
+
+.otp-input::-webkit-inner-spin-button,
+.otp-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+.otp-input:focus {
+  border-color: var(--primary);
+  background: white;
+  box-shadow: 0 0 0 4px rgba(37,99,235,0.1);
+  transform: translateY(-3px);
+}
+
+.otp-input.filled {
+  border-color: var(--secondary);
+  background: linear-gradient(135deg, rgba(37,99,235,0.03), rgba(124,58,237,0.05));
+  color: var(--secondary);
+}
+
+.otp-input.state-error {
+  border-color: var(--error);
+  background: #FEF2F2;
+  animation: shakeX 0.45s ease;
+  color: var(--error);
+}
+
+.otp-input.state-success {
+  border-color: var(--success);
+  background: #F0FDF4;
+  color: #16A34A;
+  animation: popUp 0.35s cubic-bezier(0.34,1.56,0.64,1);
+}
+
+@keyframes shakeX {
+  0%,100%{ transform: translateX(0); }
+  20%    { transform: translateX(-5px); }
+  40%    { transform: translateX(5px); }
+  60%    { transform: translateX(-3px); }
+  80%    { transform: translateX(3px); }
+}
+
+@keyframes popUp {
+  0%  { transform: translateY(0) scale(0.92); }
+  100%{ transform: translateY(-3px) scale(1); }
+}
+
+/* Box number label under each box */
+.otp-box-label {
+  display: block;
+  text-align: center;
+  font-size: 0.6rem;
+  color: var(--border);
+  margin-top: 0.3rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ─── STATUS MESSAGE ─── */
+.otp-status {
+  min-height: 1.4rem;
+  text-align: center;
+  font-size: 0.82rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.otp-status svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2.5; }
+.otp-status.error { color: var(--error); }
+.otp-status.success { color: #16A34A; }
+
+/* ─── TIMER ROW ─── */
+.timer-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 1.1rem 0 1.5rem;
+  flex-wrap: wrap;
+}
+
+.timer-ring {
+  position: relative;
+  width: 42px; height: 42px;
+  flex-shrink: 0;
+}
+
+.timer-ring svg {
+  width: 42px; height: 42px;
+  transform: rotate(-90deg);
+}
+
+.timer-ring-bg {
+  fill: none;
+  stroke: var(--border);
+  stroke-width: 3;
+}
+
+.timer-ring-fill {
+  fill: none;
+  stroke: url(#timerGrad);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-dasharray: 113;
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 1s linear;
+}
+
+.timer-ring-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--primary);
+  direction: ltr;
+  font-variant-numeric: tabular-nums;
+}
+
+.timer-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.timer-text {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.timer-resend {
+  background: none;
+  border: none;
+  font-family: 'Vazirmatn', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--primary);
+  cursor: pointer;
+  padding: 0;
+  text-align: right;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.timer-resend:disabled {
+  color: var(--text-muted);
+  cursor: default;
+  font-weight: 500;
+}
+
+.timer-resend:not(:disabled):hover { color: var(--primary-dark); text-decoration: underline; }
+.timer-resend svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2.5; }
+
+/* ─── SUBMIT BUTTON ─── */
+.btn-verify {
+  width: 100%;
+  height: 56px;
+  border: none;
+  border-radius: 15px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  font-family: 'Vazirmatn', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.btn-verify::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.18), transparent);
+  opacity: 0;
+  transition: var(--transition);
+}
+
+.btn-verify:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 32px rgba(37,99,235,0.38);
+}
+
+.btn-verify:hover:not(:disabled)::after { opacity: 1; }
+.btn-verify:active:not(:disabled) { transform: translateY(0); }
+
+.btn-verify:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-verify svg {
+  width: 20px; height: 20px;
+  stroke: white; fill: none; stroke-width: 2; stroke-linecap: round;
+}
+
+/* ─── BACK LINK ─── */
+.back-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: var(--transition);
+  padding: 0.35rem;
+  border-radius: 8px;
+}
+
+.back-link:hover { color: var(--primary); background: rgba(37,99,235,0.05); }
+.back-link svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2.5; }
+
+/* ─── SECURITY BADGE ─── */
+.security-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border);
+}
+
+.sec-item {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.sec-item svg { width: 13px; height: 13px; stroke: var(--success); fill: none; stroke-width: 2.5; }
+
+/* ─── SPINNER ─── */
+.spinner {
+  width: 21px; height: 21px;
+  border: 2.5px solid rgba(255,255,255,0.35);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.65s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ─── SUCCESS OVERLAY (shown after verify) ─── */
+.success-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(15,23,42,0.55);
+  backdrop-filter: blur(6px);
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  animation: fadeIn 0.3s ease;
+}
+
+.success-overlay.show { display: flex; }
+
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+.success-modal {
+  background: white;
+  border-radius: 24px;
+  padding: 2.5rem 2rem;
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 32px 80px rgba(15,23,42,0.18);
+  animation: modalIn 0.5s cubic-bezier(0.34,1.3,0.64,1) both;
+}
+
+@keyframes modalIn {
+  from { transform: scale(0.82) translateY(24px); opacity: 0; }
+  to   { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.success-ring {
+  width: 96px; height: 96px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #DCFCE7, #BBF7D0);
+  border: 2px solid #86EFAC;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.35rem;
+}
+
+.success-check {
+  width: 54px; height: 54px;
+  stroke: #16A34A;
+  fill: none;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 120;
+  stroke-dashoffset: 120;
+}
+
+.success-check.draw { animation: drawCheck 0.6s ease 0.2s forwards; }
+
+@keyframes drawCheck { to { stroke-dashoffset: 0; } }
+
+.success-modal h2 {
+  font-size: 1.4rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+
+.success-modal h2 span {
+  background: linear-gradient(135deg, #16A34A, var(--primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.success-modal p {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  line-height: 1.7;
+  margin-bottom: 1.75rem;
+}
+
+.tracking-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: linear-gradient(135deg, rgba(37,99,235,0.07), rgba(124,58,237,0.07));
+  border: 1px solid rgba(37,99,235,0.14);
+  border-radius: 10px;
+  padding: 0.55rem 1.1rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 1.75rem;
+}
+
+.tracking-badge svg { width: 15px; height: 15px; stroke: var(--primary); fill: none; stroke-width: 2; }
+
+.btn-modal-home {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  width: 100%;
+  height: 52px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  border: none;
+  border-radius: 13px;
+  font-family: 'Vazirmatn', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  transition: var(--transition);
+  margin-bottom: 0.7rem;
+}
+
+.btn-modal-home:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(37,99,235,0.33); }
+.btn-modal-home svg { width: 18px; height: 18px; stroke: white; fill: none; stroke-width: 2; }
+
+.btn-modal-courses {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  width: 100%;
+  height: 46px;
+  background: transparent;
+  color: var(--primary);
+  border: 1.5px solid rgba(37,99,235,0.28);
+  border-radius: 13px;
+  font-family: 'Vazirmatn', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+.btn-modal-courses:hover { background: rgba(37,99,235,0.05); border-color: var(--primary); }
+</style>
+</head>
+<body>
+
+<!-- SVG DEFS for gradients (hidden) -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="iconGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2563EB"/>
+      <stop offset="100%" stop-color="#7C3AED"/>
+    </linearGradient>
+    <linearGradient id="timerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2563EB"/>
+      <stop offset="100%" stop-color="#7C3AED"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<!-- BACKGROUND -->
+<div class="page-bg" aria-hidden="true">
+  <div class="bg-blob bg-blob-1"></div>
+  <div class="bg-blob bg-blob-2"></div>
+  <div class="bg-blob bg-blob-3"></div>
+  <div class="bg-grid"></div>
+</div>
+
+<!-- HEADER -->
+<header class="header" role="banner">
+  <a href="index.html" class="logo" aria-label="پژوهش‌سرا - صفحه اصلی">
+    <div class="logo-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    </div>
+    <div>
+      <span class="logo-text">پژوهش‌سرا</span>
+      <span class="logo-sub">مرکز علوم و فناوری</span>
+    </div>
+  </a>
+  <a href="register.html" class="header-back" aria-label="بازگشت به فرم ثبت‌نام">
+    <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+    ویرایش اطلاعات
+  </a>
+</header>
+
+<!-- PAGE -->
+<main class="page-wrap">
+  <div class="card" role="main" aria-label="تأیید کد OTP">
+
+    <!-- ── STEP INDICATOR ── -->
+    <div class="steps-row" aria-label="مراحل ثبت‌نام">
+      <div class="step-dot">
+        <div class="step-circle done" aria-label="مرحله ۱ تکمیل شد">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <span class="step-label done">اطلاعات</span>
+      </div>
+      <div class="step-line done" role="separator"></div>
+      <div class="step-dot">
+        <div class="step-circle active" aria-current="step" aria-label="مرحله جاری: تأیید">۲</div>
+        <span class="step-label active">تأیید کد</span>
+      </div>
+      <div class="step-line" role="separator"></div>
+      <div class="step-dot">
+        <div class="step-circle" aria-label="مرحله ۳: تکمیل">۳</div>
+        <span class="step-label">تکمیل</span>
+      </div>
+    </div>
+
+    <!-- ── PHONE ICON ── -->
+    <div class="phone-icon-wrap" aria-hidden="true">
+      <svg viewBox="0 0 24 24">
+        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.83a16 16 0 0 0 6.29 6.29l.84-.84a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+      </svg>
+    </div>
+
+    <!-- ── HEAD ── -->
+    <h1 class="card-title">کد تأیید را وارد کنید</h1>
+    <p class="card-sub">کد ۶ رقمی ارسال‌شده به شماره زیر را وارد کنید</p>
+
+    <!-- Phone badge -->
+    <div class="phone-badge" aria-label="شماره موبایل">
+      <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.83a16 16 0 0 0 6.29 6.29l.84-.84a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      <span class="phone-badge-num" id="phone-display">0912 *** 4567</span>
+    </div>
+
+    <span class="phone-change">
+      شماره اشتباه است؟ <a href="register.html">ویرایش کنید</a>
+    </span>
+
+    <!-- ── OTP INPUTS ── -->
+    <p class="otp-label" id="otp-label">کد ۶ رقمی را اینجا وارد کنید</p>
+
+    <div class="otp-boxes" role="group" aria-labelledby="otp-label" dir="ltr">
+      <div class="otp-box">
+        <input class="otp-input" id="b1" type="number" inputmode="numeric"
+          maxlength="1" aria-label="رقم ۱"
+          oninput="handleInput(this,0)" onkeydown="handleKey(event,this,0)" autofocus>
+        <span class="otp-box-label">۱</span>
+      </div>
+      <div class="otp-box">
+        <input class="otp-input" id="b2" type="number" inputmode="numeric"
+          maxlength="1" aria-label="رقم ۲"
+          oninput="handleInput(this,1)" onkeydown="handleKey(event,this,1)">
+        <span class="otp-box-label">۲</span>
+      </div>
+      <div class="otp-box">
+        <input class="otp-input" id="b3" type="number" inputmode="numeric"
+          maxlength="1" aria-label="رقم ۳"
+          oninput="handleInput(this,2)" onkeydown="handleKey(event,this,2)">
+        <span class="otp-box-label">۳</span>
+      </div>
+      <div class="otp-box">
+        <input class="otp-input" id="b4" type="number" inputmode="numeric"
+          maxlength="1" aria-label="رقم ۴"
+          oninput="handleInput(this,3)" onkeydown="handleKey(event,this,3)">
+        <span class="otp-box-label">۴</span>
+      </div>
+      <div class="otp-box">
+        <input class="otp-input" id="b5" type="number" inputmode="numeric"
+          maxlength="1" aria-label="رقم ۵"
+          oninput="handleInput(this,4)" onkeydown="handleKey(event,this,4)">
+        <span class="otp-box-label">۵</span>
+      </div>
+      <div class="otp-box">
+        <input class="otp-input" id="b6" type="number" inputmode="numeric"
+          maxlength="1" aria-label="رقم ۶"
+          oninput="handleInput(this,5)" onkeydown="handleKey(event,this,5)">
+        <span class="otp-box-label">۶</span>
+      </div>
+    </div>
+
+    <!-- Status message -->
+    <div class="otp-status" id="otp-status" role="alert" aria-live="assertive"></div>
+
+    <!-- ── TIMER ── -->
+    <div class="timer-row" aria-live="polite">
+      <!-- Circular progress ring -->
+      <div class="timer-ring" aria-hidden="true">
+        <svg viewBox="0 0 42 42">
+          <circle class="timer-ring-bg" cx="21" cy="21" r="18"/>
+          <circle class="timer-ring-fill" id="timer-ring-fill" cx="21" cy="21" r="18"/>
+        </svg>
+        <div class="timer-ring-text" id="timer-ring-text">1:30</div>
+      </div>
+
+      <div class="timer-info">
+        <span class="timer-text" id="timer-label">ارسال مجدد کد تا پایان تایمر</span>
+        <button class="timer-resend" id="resend-btn" disabled onclick="resendCode()" aria-label="ارسال مجدد کد">
+          <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/></svg>
+          ارسال مجدد کد
+        </button>
+      </div>
+    </div>
+
+    <!-- ── VERIFY BUTTON ── -->
+    <button
+      class="btn-verify"
+      id="verify-btn"
+      disabled
+      onclick="verifyCode()"
+      aria-label="تأیید کد و ادامه"
+    >
+      <span id="verify-text">تأیید و تکمیل ثبت‌نام</span>
+      <svg id="verify-icon" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+
+    <!-- Back link -->
+    <a href="register.html" class="back-link">
+      <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+      بازگشت به فرم ثبت‌نام
+    </a>
+
+    <!-- Security badges -->
+    <div class="security-row" role="note" aria-label="اطلاعات امنیتی">
+      <div class="sec-item">
+        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        اتصال رمزنگاری‌شده
+      </div>
+      <div class="sec-item">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        اطلاعات محرمانه
+      </div>
+      <div class="sec-item">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        کد ۵ دقیقه اعتبار دارد
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- ── SUCCESS OVERLAY ── -->
+<div class="success-overlay" id="success-overlay" role="dialog" aria-modal="true" aria-label="ثبت‌نام موفق">
+  <div class="success-modal">
+
+    <div class="success-ring" aria-hidden="true">
+      <svg class="success-check" id="success-check" viewBox="0 0 54 54">
+        <circle cx="27" cy="27" r="23" fill="none" stroke="#BBF7D0" stroke-width="1.5"/>
+        <polyline points="14.5 27 23 35.5 39.5 19"/>
+      </svg>
+    </div>
+
+    <h2>ثبت‌نام <span>تأیید شد!</span></h2>
+    <p>
+      شماره موبایل شما با موفقیت تأیید شد.<br>
+      مشاوران پژوهش‌سرا به زودی با شما تماس می‌گیرند.
+    </p>
+
+    <div class="tracking-badge" aria-label="کد پیگیری">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      کد پیگیری: <span id="tracking-id">PS-1403-5821</span>
+    </div>
+
+    <a href="index.html" class="btn-modal-home">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      بازگشت به صفحه اصلی
+    </a>
+    <a href="index.html#courses" class="btn-modal-courses">
+      مشاهده دوره‌های آموزشی
+    </a>
+
+  </div>
+</div>
+
+<script>
+/* ════════════════════════════
+   CONFIG
+════════════════════════════ */
+const BOXES      = ['b1','b2','b3','b4','b5','b6'];
+const TOTAL_SEC  = 90;
+const RING_CIRC  = 113; // 2π × 18
+
+let timerSec     = TOTAL_SEC;
+let timerHandle  = null;
+let attempts     = 0;
+
+/* ════════════════════════════
+   INIT
+════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  // Read phone from URL param or sessionStorage (demo: use placeholder)
+  const params  = new URLSearchParams(location.search);
+  const phone   = params.get('phone') || sessionStorage.getItem('reg_phone') || '09121234567';
+  const masked  = phone.slice(0,4) + ' *** ' + phone.slice(-4);
+  document.getElementById('phone-display').textContent = masked;
+
+  startTimer();
+
+  // Paste support on any box
+  BOXES.forEach((id, i) => {
+    document.getElementById(id).addEventListener('paste', handlePaste);
+  });
+});
+
+/* ════════════════════════════
+   INPUT HANDLING
+════════════════════════════ */
+function handleInput(el, idx) {
+  let v = el.value.replace(/\D/g, '');
+  if (v.length > 1) v = v[v.length - 1];
+  el.value = v;
+
+  clearBoxStates();
+
+  if (v) {
+    el.classList.add('filled');
+    const next = document.getElementById(BOXES[idx + 1]);
+    if (next) next.focus();
+  } else {
+    el.classList.remove('filled');
+  }
+
+  checkComplete();
+}
+
+function handleKey(e, el, idx) {
+  if (e.key === 'Backspace' && !el.value) {
+    const prev = document.getElementById(BOXES[idx - 1]);
+    if (prev) {
+      prev.value = '';
+      prev.classList.remove('filled');
+      prev.focus();
+    }
+  }
+  if (e.key === 'ArrowRight' && idx > 0) {
+    document.getElementById(BOXES[idx - 1])?.focus();
+  }
+  if (e.key === 'ArrowLeft' && idx < 5) {
+    document.getElementById(BOXES[idx + 1])?.focus();
+  }
+}
+
+function handlePaste(e) {
+  e.preventDefault();
+  const text = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '').slice(0, 6);
+  BOXES.forEach((id, i) => {
+    const box = document.getElementById(id);
+    const ch  = text[i] || '';
+    box.value = ch;
+    ch ? box.classList.add('filled') : box.classList.remove('filled');
+  });
+  checkComplete();
+  const lastFilled = Math.min(text.length, 5);
+  document.getElementById(BOXES[lastFilled])?.focus();
+}
+
+function clearBoxStates() {
+  BOXES.forEach(id => {
+    document.getElementById(id).classList.remove('state-error','state-success');
+  });
+  setStatus('', '');
+}
+
+function checkComplete() {
+  const full = BOXES.every(id => document.getElementById(id)?.value.length === 1);
+  document.getElementById('verify-btn').disabled = !full;
+}
+
+/* ════════════════════════════
+   TIMER
+════════════════════════════ */
+function startTimer() {
+  stopTimer();
+  timerSec = TOTAL_SEC;
+  updateTimer();
+  document.getElementById('resend-btn').disabled = true;
+  document.getElementById('timer-label').textContent = 'ارسال مجدد کد تا پایان تایمر';
+
+  timerHandle = setInterval(() => {
+    timerSec--;
+    updateTimer();
+    if (timerSec <= 0) {
+      stopTimer();
+      document.getElementById('resend-btn').disabled = false;
+      document.getElementById('timer-label').textContent = 'می‌توانید کد جدید دریافت کنید';
+      document.getElementById('timer-ring-text').textContent = '0:00';
+    }
+  }, 1000);
+}
+
+function stopTimer() {
+  if (timerHandle) { clearInterval(timerHandle); timerHandle = null; }
+}
+
+function updateTimer() {
+  const m   = Math.floor(timerSec / 60);
+  const s   = timerSec % 60;
+  const txt = m + ':' + String(s).padStart(2, '0');
+
+  document.getElementById('timer-ring-text').textContent = txt;
+
+  // Circular ring progress
+  const ratio  = timerSec / TOTAL_SEC;
+  const offset = RING_CIRC * (1 - ratio);
+  document.getElementById('timer-ring-fill').style.strokeDashoffset = offset;
+}
+
+function resendCode() {
+  // Reset inputs
+  BOXES.forEach(id => {
+    const b = document.getElementById(id);
+    b.value = '';
+    b.classList.remove('filled', 'state-error', 'state-success');
+  });
+  setStatus('', '');
+  document.getElementById('verify-btn').disabled = true;
+  attempts = 0;
+  startTimer();
+  document.getElementById('b1').focus();
+
+  setStatus('کد جدید ارسال شد ✓', 'success');
+  setTimeout(() => setStatus('', ''), 3000);
+}
+
+/* ════════════════════════════
+   STATUS
+════════════════════════════ */
+function setStatus(msg, type) {
+  const el = document.getElementById('otp-status');
+  el.className = 'otp-status' + (type ? ' ' + type : '');
+
+  if (!msg) { el.innerHTML = ''; return; }
+
+  const icon = type === 'error'
+    ? '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>'
+    : type === 'success'
+    ? '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg>'
+    : '';
+
+  el.innerHTML = icon + msg;
+}
+
+/* ════════════════════════════
+   VERIFY
+════════════════════════════ */
+function verifyCode() {
+  const code    = BOXES.map(id => document.getElementById(id).value).join('');
+  const btn     = document.getElementById('verify-btn');
+  const btnText = document.getElementById('verify-text');
+  const btnIcon = document.getElementById('verify-icon');
+
+  // Loading
+  btn.disabled  = true;
+  btnText.textContent = 'در حال بررسی...';
+  btnIcon.style.display = 'none';
+  const spinner = document.createElement('div');
+  spinner.className = 'spinner';
+  spinner.id = 'v-spinner';
+  btn.appendChild(spinner);
+
+  setTimeout(() => {
+    // Remove spinner
+    document.getElementById('v-spinner')?.remove();
+    btnText.textContent = 'تأیید و تکمیل ثبت‌نام';
+    btnIcon.style.display = '';
+
+    // Demo: "000000" = wrong
+    if (code === '000000') {
+      attempts++;
+      BOXES.forEach((id, i) => {
+        setTimeout(() => document.getElementById(id).classList.add('state-error'), i * 50);
+      });
+
+      const msg = attempts >= 3
+        ? `کد اشتباه است. ${3 - attempts < 1 ? 'حساب موقتاً قفل شد.' : `${3 - attempts} تلاش باقی‌مانده.`}`
+        : 'کد وارد‌شده اشتباه است. دوباره تلاش کنید.';
+
+      setStatus(msg, 'error');
+
+      setTimeout(() => {
+        BOXES.forEach(id => {
+          const b = document.getElementById(id);
+          b.classList.remove('state-error');
+          b.value = '';
+          b.classList.remove('filled');
+        });
+        btn.disabled = false;
+        document.getElementById('b1').focus();
+      }, 1600);
+
+    } else {
+      // SUCCESS
+      stopTimer();
+      BOXES.forEach((id, i) => {
+        setTimeout(() => {
+          document.getElementById(id).classList.remove('filled');
+          document.getElementById(id).classList.add('state-success');
+        }, i * 70);
+      });
+      setStatus('کد تأیید شد!', 'success');
+
+      setTimeout(() => showSuccess(), 900);
+    }
+  }, 1400);
+}
+
+/* ════════════════════════════
+   SUCCESS MODAL
+════════════════════════════ */
+function showSuccess() {
+  const code = 'PS-1403-' + Math.floor(1000 + Math.random() * 9000);
+  document.getElementById('tracking-id').textContent = code;
+
+  const overlay = document.getElementById('success-overlay');
+  overlay.classList.add('show');
+
+  // Animate check
+  setTimeout(() => {
+    document.getElementById('success-check').classList.add('draw');
+  }, 200);
+
+  // Trap focus inside modal
+  overlay.querySelector('.btn-modal-home').focus();
+}
+</script>
+</body>
+</html>
