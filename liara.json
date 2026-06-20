@@ -1,6 +1,6 @@
 {
   "platform": "django",
-  "app": "pazhooheshsaraa",
+  "app": "test-mirzaei",
   "port": 8000,
   "django": {
     "pythonVersion": "3.12",

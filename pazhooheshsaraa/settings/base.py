@@ -34,6 +34,7 @@ DEBUG = env('DEBUG')
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
 
 _liara_app = os.getenv('LIARA_APP_NAME', '') or _env_or('LIARA_APP')
+_on_liara = bool(_liara_app or os.getenv('LIARA_APP_URL') or os.getenv('LIARA_URL'))
 _liara_url = os.getenv('LIARA_APP_URL', '') or os.getenv('LIARA_URL', '')
 if _liara_app and f'{_liara_app}.liara.run' not in ALLOWED_HOSTS:
     ALLOWED_HOSTS.append(f'{_liara_app}.liara.run')
@@ -116,13 +117,27 @@ DATABASES = {
     }
 }
 
-if env.bool('USE_SQLITE', default=False):
+_use_sqlite = env.bool('USE_SQLITE', default=False)
+if _on_liara:
+    _use_sqlite = False
+
+if _use_sqlite:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
+elif _on_liara:
+    _pg_host = DATABASES['default']['HOST']
+    _pg_name = DATABASES['default']['NAME']
+    if not _pg_host or _pg_host in ('localhost', '127.0.0.1') or not _pg_name:
+        from django.core.exceptions import ImproperlyConfigured
+
+        raise ImproperlyConfigured(
+            'روی Liara باید PostgreSQL تنظیم شود. USE_SQLITE=False بگذارید و '
+            'متغیرهای POSTGRESQL_DB_HOST/PORT/USER/PASS/NAME را در پنل لیارا وارد کنید.'
+        )
 
 AUTH_USER_MODEL = 'users.User'
 
