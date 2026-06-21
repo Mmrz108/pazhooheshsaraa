@@ -43,6 +43,32 @@ def _database_from_url(url):
     }
 
 
+def _postgres_env_config(*, allow_localhost_defaults=False):
+    """PostgreSQL from DATABASE_URL or Liara POSTGRESQL_DB_* / DB_* env vars."""
+    url = _env_or('DATABASE_URL', 'POSTGRESQL_URI', 'POSTGRES_URI')
+    if url:
+        return _database_from_url(url)
+
+    if allow_localhost_defaults:
+        return {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': _env_or('POSTGRESQL_DB_NAME', 'DB_NAME', default='pazhooheshsaraa'),
+            'USER': _env_or('POSTGRESQL_DB_USER', 'DB_USER', default='postgres'),
+            'PASSWORD': _env_or('POSTGRESQL_DB_PASS', 'DB_PASSWORD', default='postgres'),
+            'HOST': _env_or('POSTGRESQL_DB_HOST', 'DB_HOST', default='localhost'),
+            'PORT': _env_or('POSTGRESQL_DB_PORT', 'DB_PORT', default='5432'),
+        }
+
+    return {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': _env_or('POSTGRESQL_DB_NAME', 'DB_NAME'),
+        'USER': _env_or('POSTGRESQL_DB_USER', 'DB_USER'),
+        'PASSWORD': _env_or('POSTGRESQL_DB_PASS', 'DB_PASSWORD'),
+        'HOST': _env_or('POSTGRESQL_DB_HOST', 'DB_HOST'),
+        'PORT': _env_or('POSTGRESQL_DB_PORT', 'DB_PORT', default='5432'),
+    }
+
+
 SECRET_KEY = env('SECRET_KEY', default='django-insecure-dev-key-change-in-production')
 DEBUG = env('DEBUG')
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
@@ -126,33 +152,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'pazhooheshsaraa.wsgi.application'
 ASGI_APPLICATION = 'pazhooheshsaraa.asgi.application'
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': _env_or('POSTGRESQL_DB_NAME', 'DB_NAME', default='pazhooheshsaraa'),
-        'USER': _env_or('POSTGRESQL_DB_USER', 'DB_USER', default='postgres'),
-        'PASSWORD': _env_or('POSTGRESQL_DB_PASS', 'DB_PASSWORD', default='postgres'),
-        'HOST': _env_or('POSTGRESQL_DB_HOST', 'DB_HOST', default='localhost'),
-        'PORT': _env_or('POSTGRESQL_DB_PORT', 'DB_PORT', default='5432'),
-    }
-}
-
-_database_url = _env_or('DATABASE_URL', 'POSTGRESQL_URI', 'POSTGRES_URI')
-if _database_url:
-    DATABASES['default'] = _database_from_url(_database_url)
-
-if _on_liara or not DEBUG:
-    _db = DATABASES['default']
-    if not _database_url and _db.get('HOST') in ('', 'localhost', '127.0.0.1'):
-        DATABASES['default'] = {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': _env_or('POSTGRESQL_DB_NAME', 'DB_NAME'),
-            'USER': _env_or('POSTGRESQL_DB_USER', 'DB_USER'),
-            'PASSWORD': _env_or('POSTGRESQL_DB_PASS', 'DB_PASSWORD'),
-            'HOST': _env_or('POSTGRESQL_DB_HOST', 'DB_HOST'),
-            'PORT': _env_or('POSTGRESQL_DB_PORT', 'DB_PORT', default='5432'),
-        }
-
 _use_sqlite = env.bool('USE_SQLITE', default=False)
 if _on_liara or not DEBUG:
     _use_sqlite = False
@@ -164,7 +163,12 @@ if _use_sqlite:
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
-# PostgreSQL env vars are validated at runtime in liara_pre_start.sh (not here),
+else:
+    _allow_localhost = DEBUG and not _on_liara
+    DATABASES = {
+        'default': _postgres_env_config(allow_localhost_defaults=_allow_localhost),
+    }
+# Production DB config is validated at runtime in liara_pre_start.sh (not at import),
 # because Liara runs collectstatic at build time without runtime env vars.
 
 AUTH_USER_MODEL = 'users.User'
