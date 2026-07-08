@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from apps.courses.models import Course, CourseCategory, Enrollment
+from common.jalali import format_jalali_date
 
 
 class CourseCategorySerializer(serializers.ModelSerializer):
@@ -20,12 +21,18 @@ class CourseListSerializer(serializers.ModelSerializer):
     remaining_capacity = serializers.SerializerMethodField()
     is_full = serializers.SerializerMethodField()
     image = serializers.SerializerMethodField()
+    registration_deadline_jalali = serializers.SerializerMethodField()
+    registration_open = serializers.SerializerMethodField()
+    start_date_jalali = serializers.SerializerMethodField()
+    end_date_jalali = serializers.SerializerMethodField()
 
     class Meta:
         model = Course
         fields = [
             'id', 'title', 'slug', 'description', 'image', 'price',
-            'category', 'age_group', 'level', 'capacity', 'start_date', 'end_date',
+            'category', 'age_group', 'level', 'capacity',
+            'start_date_jalali', 'end_date_jalali', 'schedule',
+            'registration_deadline_jalali', 'registration_open',
             'enrolled_count', 'remaining_capacity', 'is_full', 'created_at',
         ]
 
@@ -49,6 +56,20 @@ class CourseListSerializer(serializers.ModelSerializer):
 
     def get_is_full(self, obj):
         return self.get_enrolled_count(obj) >= obj.capacity
+
+    def get_registration_deadline_jalali(self, obj):
+        if not obj.registration_deadline:
+            return None
+        return format_jalali_date(obj.registration_deadline)
+
+    def get_start_date_jalali(self, obj):
+        return format_jalali_date(obj.start_date)
+
+    def get_end_date_jalali(self, obj):
+        return format_jalali_date(obj.end_date)
+
+    def get_registration_open(self, obj):
+        return obj.is_registration_open
 
 
 class CourseDetailSerializer(CourseListSerializer):

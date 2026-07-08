@@ -2,12 +2,12 @@
 set -e
 
 echo "=== liara_pre_start.sh ==="
-mkdir -p media cache staticfiles
 
 echo "Checking database configuration..."
 python <<'PY'
 import os
 import sys
+from pathlib import Path
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'pazhooheshsaraa.settings')
 
@@ -17,14 +17,50 @@ django.setup()
 from django.conf import settings
 
 engine = settings.DATABASES['default']['ENGINE']
+db_name = settings.DATABASES['default'].get('NAME', '')
+
+print(f'DB engine: {engine}')
+print(f'DB path/name: {db_name or "(empty)"}')
+print(f'USE_SQLITE: {os.getenv("USE_SQLITE", "(not set, default=True)")}')
+print(f'MEDIA_ROOT: {settings.MEDIA_ROOT}')
+
+if 'sqlite' in engine:
+    db_path = Path(str(db_name))
+    write_dir = db_path.parent if db_path.suffix else db_path
+    test_file = write_dir / '.write_test'
+    try:
+        test_file.write_text('ok', encoding='utf-8')
+        test_file.unlink(missing_ok=True)
+    except OSError as exc:
+        print('')
+        print('FATAL: SQLite/data directory is not writable.')
+        print(f'Path: {write_dir}')
+        print('In Liara Console create a disk named "data" and mount it to data/.')
+        print(f'Error: {exc}')
+        sys.exit(1)
+    print('SQLite: writable OK')
+
+    media_root = settings.MEDIA_ROOT
+    media_test = Path(str(media_root)) / '.write_test'
+    try:
+        Path(str(media_root)).mkdir(parents=True, exist_ok=True)
+        media_test.write_text('ok', encoding='utf-8')
+        media_test.unlink(missing_ok=True)
+    except OSError as exc:
+        print('')
+        print('FATAL: MEDIA_ROOT is not writable.')
+        print(f'Path: {media_root}')
+        print('In Liara Console create a disk named "media" and mount it to media/.')
+        print(f'Error: {exc}')
+        sys.exit(1)
+    print(f'MEDIA_ROOT: writable OK ({media_root})')
+    raise SystemExit(0)
+
 host = settings.DATABASES['default'].get('HOST', '')
-name = settings.DATABASES['default'].get('NAME', '')
 user = settings.DATABASES['default'].get('USER', '')
 port = settings.DATABASES['default'].get('PORT', '')
 
-print(f'DB engine: {engine}')
 print(f'DB host: {host or "(empty)"}')
-print(f'DB name: {name or "(empty)"}')
 print(f'DB user: {user or "(empty)"}')
 print(f'DB port: {port or "(empty)"}')
 
@@ -41,7 +77,6 @@ database_url = next((os.getenv(k) for k in URL_KEYS if os.getenv(k)), '')
 missing = []
 
 print('--- env vars ---')
-print(f'USE_SQLITE: {os.getenv("USE_SQLITE", "(not set)")}')
 if database_url:
     print('DATABASE_URL: set')
 else:
@@ -57,24 +92,10 @@ else:
             print(f'{label}: MISSING')
             missing.append(label)
 
-if 'sqlite' in engine:
-    print('FATAL: SQLite is not supported on Liara. Set USE_SQLITE=False.')
-    sys.exit(1)
-
-if os.getenv('USE_SQLITE', '').lower() in ('1', 'true', 'yes'):
-    print('FATAL: USE_SQLITE must be False on Liara.')
-    sys.exit(1)
-
 if 'postgresql' in engine and host in ('', 'localhost', '127.0.0.1'):
     print('')
     print('FATAL: PostgreSQL is not configured.')
-    print('In Liara Console:')
-    print('  1) Databases -> PostgreSQL -> open your database')
-    print('  2) Copy connection info from the Connection tab')
-    print('  3) App test-mirzaei -> Settings -> Environment Variables')
-    print('  4) Either set DATABASE_URL=postgresql://USER:PASS@HOST:PORT/DBNAME')
-    print('     OR set POSTGRESQL_DB_HOST/PORT/USER/PASS/NAME from the panel')
-    print('  5) Set USE_SQLITE=False and redeploy')
+    print('Set USE_SQLITE=True for SQLite, or add POSTGRESQL_DB_* env vars.')
     if not database_url and missing:
         print('')
         print('Missing vars:', ', '.join(missing))

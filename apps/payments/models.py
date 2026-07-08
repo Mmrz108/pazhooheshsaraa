@@ -8,6 +8,7 @@ class PaymentStatus(models.TextChoices):
 
 
 class PaymentGateway(models.TextChoices):
+    MELLI_NEW = 'melli_new', 'سداد ملی (جدید)'
     ZARINPAL = 'zarinpal', 'زرین‌پال'
 
 
@@ -31,7 +32,7 @@ class Payment(models.Model):
         'درگاه',
         max_length=20,
         choices=PaymentGateway.choices,
-        default=PaymentGateway.ZARINPAL,
+        default=PaymentGateway.MELLI_NEW,
     )
     status = models.CharField(
         'وضعیت',

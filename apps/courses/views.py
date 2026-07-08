@@ -4,6 +4,7 @@ from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from apps.courses.availability import open_for_registration_q, visible_on_site_q
 from apps.courses.models import Course, CourseCategory, EnrollmentStatus
 from apps.courses.serializers import (
     CourseCategoryDetailSerializer,
@@ -14,12 +15,12 @@ from apps.courses.serializers import (
 
 
 def course_queryset():
-    return Course.objects.filter(is_active=True).select_related('category').annotate(
+    return Course.objects.filter(visible_on_site_q()).select_related('category').annotate(
         paid_enrollment_count=Count(
             'enrollments',
             filter=Q(enrollments__status=EnrollmentStatus.PAID),
         ),
-    ).order_by('-created_at')
+    ).order_by('priority', '-created_at')
 
 
 class CourseListView(generics.ListAPIView):
@@ -60,7 +61,7 @@ class CourseCategoryListView(generics.ListAPIView):
         return CourseCategory.objects.filter(is_active=True).annotate(
             course_count=Count(
                 'courses',
-                filter=Q(courses__is_active=True),
+                filter=open_for_registration_q(prefix='courses'),
             ),
         )
 
@@ -73,7 +74,7 @@ class CourseCategoryDetailView(APIView):
             category = CourseCategory.objects.filter(is_active=True).annotate(
                 course_count=Count(
                     'courses',
-                    filter=Q(courses__is_active=True),
+                    filter=open_for_registration_q(prefix='courses'),
                 ),
             ).get(slug=slug)
         except CourseCategory.DoesNotExist as exc:

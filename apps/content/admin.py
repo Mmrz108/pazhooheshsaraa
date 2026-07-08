@@ -4,8 +4,7 @@ from apps.content.models import (
     Article,
     ArticleCategory,
     Association,
-    GalleryCategory,
-    GalleryImage,
+    Festival,
     SiteSettings,
 )
 
@@ -28,26 +27,20 @@ class ArticleAdmin(admin.ModelAdmin):
 
 @admin.register(Association)
 class AssociationAdmin(admin.ModelAdmin):
-    list_display = ['title', 'order', 'is_active']
+    list_display = ['title', 'slug', 'order', 'is_active']
     list_filter = ['is_active']
-    search_fields = ['title', 'description']
+    search_fields = ['title', 'description', 'content']
+    prepopulated_fields = {'slug': ('title',)}
     list_editable = ['order', 'is_active']
 
 
-class GalleryImageInline(admin.TabularInline):
-    model = GalleryImage
-    extra = 1
-
-
-@admin.register(GalleryCategory)
-class GalleryCategoryAdmin(admin.ModelAdmin):
-    list_display = ['title', 'slug', 'order', 'image_count']
+@admin.register(Festival)
+class FestivalAdmin(admin.ModelAdmin):
+    list_display = ['title', 'slug', 'order', 'is_active']
+    list_filter = ['is_active']
+    search_fields = ['title', 'description', 'content']
     prepopulated_fields = {'slug': ('title',)}
-    inlines = [GalleryImageInline]
-
-    @admin.display(description='تعداد تصاویر')
-    def image_count(self, obj):
-        return obj.images.count()
+    list_editable = ['order', 'is_active']
 
 
 @admin.register(SiteSettings)

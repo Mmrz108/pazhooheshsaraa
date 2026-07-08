@@ -2,6 +2,15 @@
   "platform": "django",
   "app": "test-mirzaei",
   "port": 8000,
+  "disks": [
+    {
+      "name": "data",
+      "mountTo": "data"
+    },{
+      "name": "media",
+      "mountTo": "media"
+    }
+  ],
   "django": {
     "pythonVersion": "3.12",
     "collectStatic": true,

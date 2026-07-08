@@ -11,10 +11,13 @@ const AuthModal = (() => {
   let resendCooldown = 60;
   let otpSecondsLeft = 0;
   let resendSecondsLeft = 0;
-  let datePickerLoaded = false;
+  let birthSelectsReady = false;
   let verifying = false;
   let sendingOtp = false;
   let autoSendDone = false;
+
+  const USER_PANEL_ICON = '<svg class="btn-user-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4zm0 2c-3.31 0-6 1.79-6 4v1h12v-1c0-2.21-2.69-4-6-4z"/></svg>';
+  const LOGIN_ICON = '<svg class="btn-login-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4zm0 2c-3.31 0-6 1.79-6 4v1h12v-1c0-2.21-2.69-4-6-4z"/></svg>';
 
   function $(sel, root = document) { return root.querySelector(sel); }
   function $$(sel, root = document) { return [...root.querySelectorAll(sel)]; }
@@ -55,6 +58,23 @@ const AuthModal = (() => {
     localStorage.setItem('user', JSON.stringify(data.user));
     clearAdminSession();
     window.dispatchEvent(new CustomEvent('auth:login', { detail: data.user }));
+  }
+
+  async function finishAuthFlow(data, welcomeMessage) {
+    saveSession(data);
+    sessionStorage.removeItem('auth_mobile');
+    stopTimers();
+    close();
+
+    const pendingId = window.SiteUtils?.getPendingEnrollment?.();
+    if (pendingId) {
+      if (welcomeMessage) toast(welcomeMessage, 'success');
+      await window.SiteUtils.startCoursePayment(pendingId, null);
+      return;
+    }
+
+    if (welcomeMessage) toast(welcomeMessage, 'success');
+    setTimeout(() => { window.location.href = '/dashboard/'; }, 600);
   }
 
   function clearAdminSession() {
@@ -146,8 +166,19 @@ const AuthModal = (() => {
             <div class="auth-hint">با کیبورد فارسی یا انگلیسی قابل ورود است</div>
           </div>
           <div class="auth-field">
-            <label class="auth-label" for="auth-birth-date">تاریخ تولد (شمسی) *</label>
-            <input class="auth-input ltr" type="text" id="auth-birth-date" placeholder="مثال: 1385/03/15" readonly>
+            <label class="auth-label" id="auth-birth-label">تاریخ تولد (شمسی) *</label>
+            <div class="auth-birth-row" role="group" aria-labelledby="auth-birth-label">
+              <select class="auth-input auth-birth-select" id="auth-birth-year" aria-label="سال">
+                <option value="">سال</option>
+              </select>
+              <select class="auth-input auth-birth-select" id="auth-birth-month" aria-label="ماه" disabled>
+                <option value="">ماه</option>
+              </select>
+              <select class="auth-input auth-birth-select" id="auth-birth-day" aria-label="روز" disabled>
+                <option value="">روز</option>
+              </select>
+            </div>
+            <input type="hidden" id="auth-birth-date">
             <div class="auth-error" id="auth-birth-date-err">تاریخ تولد را انتخاب کنید</div>
           </div>
           <button type="submit" class="auth-btn" id="auth-register-btn">ثبت‌نام و ورود</button>
@@ -250,7 +281,7 @@ const AuthModal = (() => {
       autoSendDone = false;
     }
     if (step === 'profile') {
-      loadDatePicker();
+      initBirthDateSelects();
     }
   }
 
@@ -416,11 +447,7 @@ const AuthModal = (() => {
         toast('لطفاً اطلاعات خود را تکمیل کنید', 'info');
         goStep('profile');
       } else {
-        saveSession(data);
-        stopTimers();
-        close();
-        toast(`خوش آمدید ${data.user.first_name}!`, 'success');
-        setTimeout(() => { window.location.href = '/dashboard/'; }, 600);
+        await finishAuthFlow(data, `خوش آمدید ${data.user.first_name}!`);
       }
     } catch (err) {
       showOtpErr(err.detail || 'کد تأیید نادرست است');
@@ -447,6 +474,157 @@ const AuthModal = (() => {
     if (code.length !== 10) return 'length';
     if (!validateNationalCode(code)) return 'checksum';
     return null;
+  }
+
+  const JALALI_MONTHS = [
+    'فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور',
+    'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند',
+  ];
+
+  function isJalaliLeap(year) {
+    const a = (year - (year > 0 ? 474 : 473)) % 2820 + 474;
+    return (((a + 38) * 682) % 2816) < 682;
+  }
+
+  function jalaliMonthLength(year, month) {
+    if (month >= 1 && month <= 6) return 31;
+    if (month >= 7 && month <= 11) return 30;
+    return isJalaliLeap(year) ? 30 : 29;
+  }
+
+  function currentJalaliYear() {
+    try {
+      if (window.persianDate) {
+        return new window.persianDate().year();
+      }
+    } catch {
+      /* fall through */
+    }
+    return new Date().getFullYear() - 621;
+  }
+
+  function fillSelectOptions(select, items, placeholder) {
+    if (!select) return;
+    select.innerHTML = `<option value="">${placeholder}</option>`;
+    items.forEach(({ value, label }) => {
+      const opt = document.createElement('option');
+      opt.value = String(value);
+      opt.textContent = label;
+      select.appendChild(opt);
+    });
+  }
+
+  function refreshBirthDayOptions() {
+    const year = parseInt($('#auth-birth-year')?.value || '', 10);
+    const month = parseInt($('#auth-birth-month')?.value || '', 10);
+    const daySelect = $('#auth-birth-day');
+    if (!daySelect) return;
+
+    if (!year || !month) {
+      daySelect.disabled = true;
+      fillSelectOptions(daySelect, [], 'روز');
+      return;
+    }
+
+    const currentDay = parseInt(daySelect.value || '', 10);
+    const days = jalaliMonthLength(year, month);
+    const items = Array.from({ length: days }, (_, i) => {
+      const day = i + 1;
+      return { value: day, label: String(day).replace(/\d/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[d]) };
+    });
+    fillSelectOptions(daySelect, items, 'روز');
+    daySelect.disabled = false;
+    if (currentDay && currentDay <= days) {
+      daySelect.value = String(currentDay);
+    }
+  }
+
+  function syncBirthDateFromSelects() {
+    const hidden = $('#auth-birth-date');
+    const year = parseInt($('#auth-birth-year')?.value || '', 10);
+    const month = parseInt($('#auth-birth-month')?.value || '', 10);
+    const day = parseInt($('#auth-birth-day')?.value || '', 10);
+    if (!hidden || !year || !month || !day) {
+      if (hidden) delete hidden.dataset.gregorian;
+      return '';
+    }
+
+    const jalaliText = `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')}`;
+    hidden.value = jalaliText;
+
+    if (window.persianDate) {
+      try {
+        const greg = new window.persianDate([year, month, day])
+          .toCalendar('gregorian')
+          .format('YYYY-MM-DD');
+        hidden.dataset.gregorian = greg;
+        showFieldErr('auth-birth-date-err', false);
+        return greg;
+      } catch {
+        delete hidden.dataset.gregorian;
+        return '';
+      }
+    }
+    return resolveGregorianBirthDate(hidden);
+  }
+
+  function bindBirthDateSelects() {
+    const yearSelect = $('#auth-birth-year');
+    const monthSelect = $('#auth-birth-month');
+    const daySelect = $('#auth-birth-day');
+    if (!yearSelect || yearSelect.dataset.bound === '1') return;
+    yearSelect.dataset.bound = '1';
+
+    yearSelect.addEventListener('change', () => {
+      const hasYear = !!yearSelect.value;
+      monthSelect.disabled = !hasYear;
+      if (!hasYear) {
+        monthSelect.value = '';
+        daySelect.value = '';
+        daySelect.disabled = true;
+        fillSelectOptions(daySelect, [], 'روز');
+      }
+      refreshBirthDayOptions();
+      syncBirthDateFromSelects();
+    });
+
+    monthSelect.addEventListener('change', () => {
+      refreshBirthDayOptions();
+      syncBirthDateFromSelects();
+    });
+
+    daySelect.addEventListener('change', syncBirthDateFromSelects);
+  }
+
+  async function initBirthDateSelects() {
+    if (birthSelectsReady) {
+      syncBirthDateFromSelects();
+      return;
+    }
+
+    try {
+      await loadScript('https://cdn.jsdelivr.net/npm/persian-date@1.1.0/dist/persian-date.min.js');
+    } catch {
+      /* conversion may fail without library */
+    }
+
+    const endYear = currentJalaliYear();
+    const startYear = Math.max(1320, endYear - 80);
+    const years = [];
+    for (let year = endYear; year >= startYear; year -= 1) {
+      const label = String(year).replace(/\d/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[d]);
+      years.push({ value: year, label });
+    }
+    fillSelectOptions($('#auth-birth-year'), years, 'سال');
+
+    const months = JALALI_MONTHS.map((label, index) => ({
+      value: index + 1,
+      label,
+    }));
+    fillSelectOptions($('#auth-birth-month'), months, 'ماه');
+
+    bindBirthDateSelects();
+    birthSelectsReady = true;
   }
 
   function resolveGregorianBirthDate(birthInput) {
@@ -490,7 +668,7 @@ const AuthModal = (() => {
     const fatherName = $('#auth-father-name')?.value.trim();
     const nationalCode = digitsOnly($('#auth-national-code')?.value || '', 10);
     const birthInput = $('#auth-birth-date');
-    const birthDate = resolveGregorianBirthDate(birthInput);
+    const birthDate = syncBirthDateFromSelects() || resolveGregorianBirthDate(birthInput);
     const regMobile = mobile || sessionStorage.getItem('auth_mobile') || '';
 
     const ncIssue = nationalCodeIssue(nationalCode);
@@ -513,7 +691,7 @@ const AuthModal = (() => {
 
     if (!firstName || !lastName || !fatherName || ncIssue || !birthDate) {
       if (!birthDate && birthInput?.value?.trim()) {
-        toast('تاریخ تولد نامعتبر است. از تقویم انتخاب کنید یا فرمت ۱۳۸۵/۰۳/۱۵ را وارد کنید', 'error');
+        toast('تاریخ تولد نامعتبر است. سال، ماه و روز را کامل انتخاب کنید', 'error');
       } else {
         toast('لطفاً همه فیلدهای الزامی را تکمیل کنید', 'error');
       }
@@ -541,11 +719,7 @@ const AuthModal = (() => {
           birth_date: birthDate,
         }),
       });
-      saveSession(data);
-      sessionStorage.removeItem('auth_mobile');
-      close();
-      toast('ثبت‌نام با موفقیت انجام شد', 'success');
-      setTimeout(() => { window.location.href = '/dashboard/'; }, 600);
+      await finishAuthFlow(data, 'ثبت\u200cنام با موفقیت انجام شد');
     } catch (err) {
       const fieldMsg = err.national_code?.[0] || err.birth_date?.[0] || err.mobile?.[0];
       if (err.national_code) showFieldErr('auth-national-code-err', true);
@@ -657,53 +831,6 @@ const AuthModal = (() => {
     document.head.appendChild(l);
   }
 
-  async function loadDatePicker() {
-    if (datePickerLoaded) return;
-    try {
-      loadStylesheet('https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/css/persian-datepicker.min.css');
-      await loadScript('https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js');
-      await loadScript('https://cdn.jsdelivr.net/npm/persian-date@1.1.0/dist/persian-date.min.js');
-      await loadScript('https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/js/persian-datepicker.min.js');
-      const $inp = window.jQuery('#auth-birth-date');
-      const syncGregorian = (unix) => {
-        try {
-          const pd = new window.persianDate(unix);
-          const greg = pd.toCalendar('gregorian').format('YYYY-MM-DD');
-          const inp = document.getElementById('auth-birth-date');
-          if (inp) {
-            inp.dataset.gregorian = greg;
-            showFieldErr('auth-birth-date-err', false);
-          }
-        } catch {
-          /* onSelect may fail; submit will parse display value */
-        }
-      };
-      $inp.persianDatepicker({
-        format: 'YYYY/MM/DD',
-        autoClose: true,
-        initialValue: false,
-        persianDigit: true,
-        observer: true,
-        calendar: { persian: { locale: 'fa' } },
-        onSelect: syncGregorian,
-      });
-      $inp.on('change', () => {
-        const state = $inp.data('datepicker')?.getState?.();
-        if (state?.selected?.unix) syncGregorian(state.selected.unix);
-        else resolveGregorianBirthDate(document.getElementById('auth-birth-date'));
-      });
-      datePickerLoaded = true;
-    } catch {
-      const inp = $('#auth-birth-date');
-      if (inp) {
-        inp.removeAttribute('readonly');
-        inp.placeholder = 'مثال: 1385/03/15';
-        inp.addEventListener('change', () => { resolveGregorianBirthDate(inp); });
-        inp.addEventListener('blur', () => { resolveGregorianBirthDate(inp); });
-      }
-    }
-  }
-
   function formatUserLabel(user) {
     const name = [user?.first_name, user?.last_name].filter(Boolean).join(' ').trim();
     return name || 'پنل من';
@@ -727,10 +854,13 @@ const AuthModal = (() => {
 
     document.querySelectorAll('[data-auth-open]').forEach((btn) => {
       if (user) {
-        btn.textContent = formatUserLabel(user);
-        btn.setAttribute('aria-label', 'پنل کاربری');
+        const label = formatUserLabel(user);
+        btn.innerHTML = `${USER_PANEL_ICON}<span class="btn-primary-text btn-user-name">${label}</span>`;
+        btn.classList.add('is-user-panel');
+        btn.setAttribute('aria-label', `پنل کاربری ${label}`);
       } else {
-        btn.innerHTML = `<svg viewBox="0 0 24 24" width="15" height="15" stroke="white" fill="none" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> ورود / ثبت‌نام`;
+        btn.innerHTML = `${LOGIN_ICON}<span class="btn-primary-text">ورود / ثبت‌نام</span>`;
+        btn.classList.remove('is-user-panel');
         btn.setAttribute('aria-label', 'ورود یا ثبت‌نام');
       }
     });
@@ -763,3 +893,4 @@ const AuthModal = (() => {
 })();
 
 document.addEventListener('DOMContentLoaded', () => AuthModal.init());
+window.AuthModal = AuthModal;

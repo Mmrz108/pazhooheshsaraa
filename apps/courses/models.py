@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 from django.utils.text import slugify
 
 
@@ -67,13 +68,29 @@ class Course(models.Model):
     capacity = models.PositiveIntegerField('ظرفیت')
     start_date = models.DateField('تاریخ شروع')
     end_date = models.DateField('تاریخ پایان')
+    schedule = models.TextField(
+        'روزها و ساعت برگزاری',
+        blank=True,
+        help_text='مثال: شنبه و دوشنبه · ۱۶:۰۰ تا ۱۸:۰۰',
+    )
+    registration_deadline = models.DateField(
+        'فرصت ثبت‌نام تا',
+        null=True,
+        blank=True,
+        help_text='پس از این تاریخ ثبت‌نام در دوره بسته می‌شود؛ دوره همچنان در سایت نمایش داده می‌شود.',
+    )
+    priority = models.PositiveIntegerField(
+        'اولویت',
+        default=100,
+        help_text='عدد کوچکتر = نمایش جلوتر در صفحه اصلی (۱ بالاترین اولویت).',
+    )
     is_active = models.BooleanField('فعال', default=True)
     created_at = models.DateTimeField('تاریخ ایجاد', auto_now_add=True)
 
     class Meta:
         verbose_name = 'دوره'
         verbose_name_plural = 'دوره‌ها'
-        ordering = ['-created_at']
+        ordering = ['priority', '-created_at']
 
     def __str__(self):
         return self.title
@@ -94,6 +111,14 @@ class Course(models.Model):
     @property
     def is_full(self):
         return self.enrolled_count >= self.capacity
+
+    @property
+    def is_registration_open(self):
+        if not self.is_active:
+            return False
+        if self.registration_deadline and self.registration_deadline < timezone.localdate():
+            return False
+        return True
 
 
 class EnrollmentStatus(models.TextChoices):

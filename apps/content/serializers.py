@@ -4,6 +4,7 @@ from apps.content.models import (
     Article,
     ArticleCategory,
     Association,
+    Festival,
     GalleryCategory,
     GalleryImage,
     SiteSettings,
@@ -44,7 +45,7 @@ class AssociationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Association
-        fields = ['id', 'title', 'description', 'image']
+        fields = ['id', 'title', 'slug', 'description', 'image']
 
     def get_image(self, obj):
         if not obj.image:
@@ -54,6 +55,33 @@ class AssociationSerializer(serializers.ModelSerializer):
         if request and not url.startswith('http'):
             return request.build_absolute_uri(url)
         return url
+
+
+class AssociationDetailSerializer(AssociationSerializer):
+    class Meta(AssociationSerializer.Meta):
+        fields = AssociationSerializer.Meta.fields + ['content']
+
+
+class FestivalSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Festival
+        fields = ['id', 'title', 'slug', 'description', 'image']
+
+    def get_image(self, obj):
+        if not obj.image:
+            return None
+        request = self.context.get('request')
+        url = obj.image.url
+        if request and not url.startswith('http'):
+            return request.build_absolute_uri(url)
+        return url
+
+
+class FestivalDetailSerializer(FestivalSerializer):
+    class Meta(FestivalSerializer.Meta):
+        fields = FestivalSerializer.Meta.fields + ['content']
 
 
 class GalleryImageSerializer(serializers.ModelSerializer):

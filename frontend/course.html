@@ -52,7 +52,33 @@
   .course-title { font-size: clamp(1.5rem, 4vw, 2rem); font-weight: 800; line-height: 1.4; margin-bottom: 1rem; }
   .course-desc {
     color: var(--text-muted); line-height: 1.9; font-size: 0.95rem; white-space: pre-line;
+    margin-bottom: 1.25rem;
   }
+  .course-schedule {
+    margin-top: 0.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--border);
+  }
+  .course-schedule-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.85rem;
+  }
+  .schedule-box {
+    background: linear-gradient(135deg, #EFF6FF, #F5F3FF);
+    border: 1.5px solid #BFDBFE;
+    border-radius: 12px;
+    padding: 1rem 1.1rem;
+    font-size: 0.9rem;
+    line-height: 1.9;
+    color: var(--text);
+    white-space: pre-line;
+  }
+  .schedule-placeholder { color: var(--text-muted); font-style: normal; }
   .course-sidebar {
     background: #fff; border: 1.5px solid var(--border); border-radius: var(--card-radius);
     padding: 1.5rem; position: sticky; top: 5.5rem;
@@ -83,6 +109,7 @@
   }
   .footer-mini a { color: var(--primary); text-decoration: none; }
 </style>
+<link rel="stylesheet" href="/css/auth.css">
 </head>
 <body>
 
@@ -107,6 +134,7 @@
 <script src="/js/api.js"></script>
 <script src="/js/utils.js"></script>
 <script src="/js/components.js"></script>
+<script src="/js/auth.js"></script>
 <script src="/js/app.js"></script>
 </body>
 </html>

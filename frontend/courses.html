@@ -7,18 +7,22 @@
 <title>دوره‌های آموزشی | پژوهش‌سرا</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/site-top-mobile.css">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
     --primary: #2563EB; --secondary: #7C3AED; --bg: #F8FAFC;
     --text: #0F172A; --text-muted: #64748B; --border: #E2E8F0;
     --card-radius: 16px; --transition: all 0.3s ease;
+    --header-height: 64px;
+    --nav-gap: 0px;
+    --nav-bar-height: 42px;
   }
   body { font-family: 'Vazirmatn', sans-serif; background: var(--bg); color: var(--text); direction: rtl; }
   .header {
     position: fixed; top: 0; right: 0; left: 0; z-index: 100;
     background: rgba(255,255,255,0.92); backdrop-filter: blur(16px);
-    border-bottom: 1px solid var(--border); height: 64px;
+    border-bottom: 1px solid var(--border); height: var(--header-height); min-height: var(--header-height);
     display: flex; align-items: center; justify-content: space-between; padding: 0 1.25rem;
   }
   .logo { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: inherit; }
@@ -26,17 +30,18 @@
   .logo-text { font-size: 1.1rem; font-weight: 700; display: block; line-height: 1.2; }
   .logo-sub { font-size: 0.65rem; color: var(--text-muted); display: block; }
   .scroll-nav {
-    position: sticky; top: 64px; z-index: 90; background: #fff;
-    border-bottom: 1px solid var(--border); overflow-x: auto; white-space: nowrap; padding: 0 1rem;
+    position: sticky; top: calc(var(--header-height) + var(--nav-gap)); z-index: 90; background: #fff;
+    border-bottom: 1px solid var(--border); overflow-x: auto; white-space: nowrap;
+    padding: 0 1rem; margin-top: var(--header-height);
   }
-  .scroll-nav-inner { display: inline-flex; }
+  .scroll-nav-inner { display: inline-flex; gap: 0.15rem; }
   .scroll-nav a {
     padding: 0.85rem 1rem; font-size: 0.8rem; font-weight: 500;
     color: var(--text-muted); text-decoration: none;
     border-bottom: 2.5px solid transparent; transition: var(--transition);
   }
   .scroll-nav a:hover, .scroll-nav a.active { color: var(--primary); border-bottom-color: var(--primary); }
-  .page-main { padding: 7.5rem 1.25rem 3rem; max-width: 1200px; margin: 0 auto; }
+  .page-main { padding: 2rem 1.25rem 3rem; max-width: 1200px; margin: 0 auto; }
   .breadcrumb { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.75rem; }
   .breadcrumb a { color: var(--primary); text-decoration: none; }
   .page-title { font-size: clamp(1.8rem, 5vw, 2.6rem); font-weight: 800; margin-bottom: 0.75rem; }
@@ -93,6 +98,7 @@
     color: #fff; border: none;
   }
   .btn-course:disabled { opacity: 0.6; cursor: not-allowed; }
+  .btn-course-disabled { opacity: 0.55; cursor: not-allowed; pointer-events: none; }
   .btn-course-outline {
     background: #fff; color: var(--primary); border: 1.5px solid var(--border);
   }
@@ -109,6 +115,7 @@
 </head>
 <body>
 
+<div class="site-top" data-site-top>
 <header class="header">
   <a href="/" class="logo" data-site-logo>
     <img class="logo-img" src="/images/logo.jpg" alt="پژوهش‌سرا" width="42" height="42">
@@ -122,6 +129,8 @@
 <nav class="scroll-nav" aria-label="دسته‌بندی دوره‌ها">
   <div class="scroll-nav-inner" data-site-nav></div>
 </nav>
+</div>
+<div class="site-top-spacer" data-site-top-spacer aria-hidden="true"></div>
 
 <main class="page-main">
   <nav class="breadcrumb" aria-label="مسیر">

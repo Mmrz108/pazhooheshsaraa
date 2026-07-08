@@ -66,6 +66,12 @@ function getPageType() {
   const articleMatch = path.match(/^\/articles\/([^/]+)$/i);
   if (articleMatch) return { type: 'article', slug: decodeURIComponent(articleMatch[1]) };
 
+  const associationMatch = path.match(/^\/associations\/([^/]+)$/i);
+  if (associationMatch) return { type: 'association', slug: decodeURIComponent(associationMatch[1]) };
+
+  const festivalMatch = path.match(/^\/festivals\/([^/]+)$/i);
+  if (festivalMatch) return { type: 'festival', slug: decodeURIComponent(festivalMatch[1]) };
+
   return { type: 'home' };
 }
 
@@ -118,32 +124,75 @@ function bindFadeUp(container) {
   container.querySelectorAll('.fade-up').forEach((el) => observer.observe(el));
 }
 
-async function enrollCourse(courseId, btn) {
-  const token = localStorage.getItem('access_token');
-  if (!token) {
-    alert('برای ثبت\u200cنام ابتدا وارد حساب کاربری شوید.');
-    return;
+const PENDING_ENROLLMENT_KEY = 'pending_enrollment_course_id';
+
+function setPendingEnrollment(courseId) {
+  sessionStorage.setItem(PENDING_ENROLLMENT_KEY, String(courseId));
+}
+
+function getPendingEnrollment() {
+  const id = sessionStorage.getItem(PENDING_ENROLLMENT_KEY);
+  return id ? Number(id) : null;
+}
+
+function clearPendingEnrollment() {
+  sessionStorage.removeItem(PENDING_ENROLLMENT_KEY);
+}
+
+async function startCoursePayment(courseId, btn) {
+  const defaultLabel = 'ثبت\u200cنام در دوره';
+  if (btn) {
+    btn.disabled = true;
+    btn.dataset.originalText = btn.textContent;
+    btn.textContent = 'در حال انتقال...';
   }
-  btn.disabled = true;
-  btn.textContent = 'در حال انتقال...';
   try {
     const result = await apiFetch('/payments/start/', {
       method: 'POST',
       body: JSON.stringify({ course_id: Number(courseId) }),
     });
-    if (result.payment_url) window.location.href = result.payment_url;
+    clearPendingEnrollment();
+    if (result.payment_url) {
+      window.location.href = result.payment_url;
+      return true;
+    }
+    throw new Error('آدرس درگاه پرداخت دریافت نشد');
   } catch (err) {
-    alert(err.detail || 'خطا در شروع پرداخت');
-    btn.disabled = false;
-    btn.textContent = 'ثبت\u200cنام';
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = btn.dataset.originalText || defaultLabel;
+    }
+    alert(err.detail || err.message || 'خطا در شروع پرداخت');
+    return false;
   }
 }
 
+async function resumePendingEnrollment() {
+  const courseId = getPendingEnrollment();
+  if (!courseId || !localStorage.getItem('access_token')) return false;
+  return startCoursePayment(courseId, null);
+}
+
+async function enrollCourse(courseId, btn) {
+  const token = localStorage.getItem('access_token');
+  if (!token) {
+    setPendingEnrollment(courseId);
+    if (window.AuthModal?.open) {
+      window.AuthModal.open();
+      return;
+    }
+    const returnPath = `${window.location.pathname}${window.location.search}`;
+    window.location.href = `/login/?auth=1&return=${encodeURIComponent(returnPath)}`;
+    return;
+  }
+  await startCoursePayment(courseId, btn);
+}
+
 function bindCourseButtons(container) {
-  container?.querySelectorAll('[data-course-id]').forEach((btn) => {
+  container?.querySelectorAll('[data-enroll-course]').forEach((btn) => {
     btn.addEventListener('click', (e) => {
       e.preventDefault();
-      enrollCourse(btn.dataset.courseId, btn);
+      enrollCourse(btn.dataset.enrollCourse, btn);
     });
   });
 }
@@ -153,4 +202,5 @@ window.SiteUtils = {
   LEVEL_LABELS, AGE_LABELS, BADGE_CLASSES, PLACEHOLDER_EMOJIS,
   formatPrice, formatDate, mediaUrl, escapeHtml,
   getPageType, setSEO, showEmpty, bindFadeUp, bindCourseButtons, enrollCourse,
+  resumePendingEnrollment, setPendingEnrollment, getPendingEnrollment, startCoursePayment,
 };

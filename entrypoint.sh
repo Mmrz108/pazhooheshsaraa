@@ -1,8 +1,6 @@
 #!/bin/sh
 set -e
 
-mkdir -p /app/media /app/cache
-
 echo "Running migrations..."
 python manage.py migrate --noinput
 

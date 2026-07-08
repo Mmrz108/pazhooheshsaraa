@@ -17,7 +17,14 @@ class PaymentVerifyResult:
 
 class BasePaymentGateway(ABC):
     @abstractmethod
-    def request_payment(self, amount: int, description: str, callback_url: str, mobile: str = '') -> PaymentRequestResult:
+    def request_payment(
+        self,
+        amount: int,
+        description: str,
+        callback_url: str,
+        mobile: str = '',
+        order_id: int | None = None,
+    ) -> PaymentRequestResult:
         pass
 
     @abstractmethod

@@ -4,6 +4,7 @@ from django.db import transaction
 from apps.courses.models import Enrollment, EnrollmentStatus
 from apps.payments.models import Payment, PaymentGateway, PaymentStatus
 from apps.payments.services.gateways.base import BasePaymentGateway
+from apps.payments.services.gateways.sadad_melli import SadadMelliGateway
 from apps.payments.services.gateways.zarinpal import ZarinpalGateway
 
 
@@ -16,10 +17,15 @@ class PaymentServiceError(Exception):
 
 class PaymentService:
     GATEWAYS: dict[str, type[BasePaymentGateway]] = {
+        PaymentGateway.MELLI_NEW: SadadMelliGateway,
         PaymentGateway.ZARINPAL: ZarinpalGateway,
     }
 
-    def __init__(self, gateway: str = PaymentGateway.ZARINPAL):
+    def __init__(self, gateway: str | None = None):
+        if not settings.PAYMENT_GATEWAY_ENABLED:
+            raise PaymentServiceError('درگاه پرداخت غیرفعال است.', code='gateway_disabled')
+
+        gateway = gateway or settings.PAYMENT_GATEWAY
         gateway_class = self.GATEWAYS.get(gateway)
         if not gateway_class:
             raise PaymentServiceError('درگاه پرداخت پشتیبانی نمی‌شود.', code='unsupported_gateway')
@@ -27,6 +33,12 @@ class PaymentService:
         self.gateway = gateway_class()
 
     def start_payment(self, user, course) -> dict:
+        if not course.is_registration_open:
+            raise PaymentServiceError(
+                'مهلت ثبت‌نام این دوره به پایان رسیده است.',
+                code='registration_closed',
+            )
+
         if not course.is_active:
             raise PaymentServiceError('این دوره فعال نیست.', code='course_inactive')
 
@@ -59,6 +71,7 @@ class PaymentService:
                 description=f'ثبت‌نام دوره {course.title}',
                 callback_url=settings.PAYMENT_CALLBACK_URL,
                 mobile=user.mobile,
+                order_id=payment.id,
             )
         except Exception as exc:
             payment.status = PaymentStatus.FAILED

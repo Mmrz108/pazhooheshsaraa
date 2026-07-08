@@ -6,28 +6,35 @@ from django.db.models import Count, Q, Sum
 from django.http import HttpResponse
 from django.utils.html import format_html_join
 
+from apps.users.forms import UserAddAdminForm, UserChangeAdminForm
 from apps.users.models import User
+from common.jalali import format_jalali_date, format_jalali_datetime
 
 
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
+    form = UserChangeAdminForm
+    add_form = UserAddAdminForm
     list_display = [
-        'mobile', 'full_name_display', 'national_code',
+        'mobile', 'full_name_display', 'national_code', 'birth_date_jalali',
         'is_active', 'enrollment_count', 'total_payments_display',
-        'date_joined',
+        'date_joined_jalali',
     ]
     list_filter = ['is_active', 'is_staff', 'date_joined']
     search_fields = ['mobile', 'first_name', 'last_name', 'national_code']
     ordering = ['-date_joined']
-    readonly_fields = ['date_joined', 'last_login', 'enrollment_list', 'payment_history']
+    readonly_fields = [
+        'date_joined_jalali', 'last_login_jalali',
+        'enrollment_list', 'payment_history',
+    ]
     actions = ['export_users_csv']
 
     fieldsets = (
         (None, {'fields': ('mobile', 'password')}),
-        ('اطلاعات شخصی', {'fields': ('first_name', 'last_name', 'national_code', 'father_name', 'birth_date')}),
+        ('اطلاعات شخصی', {'fields': ('first_name', 'last_name', 'national_code', 'father_name', 'birth_date_shamsi')}),
         ('دوره‌ها و پرداخت‌ها', {'fields': ('enrollment_list', 'payment_history')}),
         ('دسترسی‌ها', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
-        ('تاریخ‌ها', {'fields': ('date_joined', 'last_login')}),
+        ('تاریخ‌ها', {'fields': ('date_joined_jalali', 'last_login_jalali')}),
     )
 
     add_fieldsets = (
@@ -35,7 +42,7 @@ class UserAdmin(BaseUserAdmin):
             'classes': ('wide',),
             'fields': (
                 'mobile', 'first_name', 'last_name', 'national_code',
-                'father_name', 'birth_date', 'password1', 'password2',
+                'father_name', 'birth_date_shamsi', 'password1', 'password2',
             ),
         }),
     )
@@ -50,6 +57,18 @@ class UserAdmin(BaseUserAdmin):
     @admin.display(description='نام کامل')
     def full_name_display(self, obj):
         return obj.full_name
+
+    @admin.display(description='تاریخ تولد')
+    def birth_date_jalali(self, obj):
+        return format_jalali_date(obj.birth_date)
+
+    @admin.display(description='تاریخ عضویت', ordering='date_joined')
+    def date_joined_jalali(self, obj):
+        return format_jalali_datetime(obj.date_joined)
+
+    @admin.display(description='آخرین ورود')
+    def last_login_jalali(self, obj):
+        return format_jalali_datetime(obj.last_login)
 
     @admin.display(description='تعداد دوره‌ها', ordering='_enrollment_count')
     def enrollment_count(self, obj):
@@ -78,7 +97,7 @@ class UserAdmin(BaseUserAdmin):
         rows = format_html_join(
             '', '<tr><td>{}</td><td>{:,}</td><td>{}</td><td>{}</td></tr>',
             (
-                (p.course.title, p.amount, p.get_status_display(), p.created_at.strftime('%Y-%m-%d'))
+                (p.course.title, p.amount, p.get_status_display(), format_jalali_datetime(p.created_at))
                 for p in payments
             ),
         )

@@ -1,14 +1,10 @@
 async function loadCategories() {
+  const C = window.SiteComponents;
   try {
     const data = await apiFetch('/courses/categories/');
-    window.__categories = data.results || data;
+    window.__categories = C.mergeCategories(data.results || data);
   } catch {
-    window.__categories = [
-      { slug: 'extracurricular', title: 'فوق برنامه' },
-      { slug: 'gifted', title: 'تیزهوشان' },
-      { slug: 'olympiad', title: 'المپیاد' },
-      { slug: 'support', title: 'تقویتی' },
-    ];
+    window.__categories = C.mergeCategories([]);
   }
   const footerCats = document.querySelector('[data-footer-categories]');
   if (footerCats && window.__categories.length) {
@@ -84,38 +80,122 @@ function bindArticlesReel() {
   );
 }
 
+function isHomePath() {
+  const path = window.location.pathname.replace(/\/+$/, '') || '/';
+  return path === '/' || path === '/index.html';
+}
+
+function getNavigationType() {
+  const nav = performance.getEntriesByType('navigation')[0];
+  return nav?.type || 'navigate';
+}
+
+function scrollToHomeTop() {
+  if ('scrollRestoration' in history) {
+    history.scrollRestoration = 'manual';
+  }
+  window.scrollTo(0, 0);
+  document.documentElement.scrollTop = 0;
+  document.body.scrollTop = 0;
+}
+
+function shouldResetHomeScrollPosition() {
+  const type = getNavigationType();
+  return type === 'reload' || type === 'back_forward' || !window.location.hash;
+}
+
+function resetHomeTopNavState() {
+  document.querySelectorAll('.scroll-nav a').forEach((link) => link.classList.remove('active'));
+  document.querySelectorAll('.bottom-nav-item').forEach((item) => {
+    const isHome = item.getAttribute('href') === '#home';
+    item.classList.toggle('active', isHome);
+    if (isHome) item.setAttribute('aria-current', 'page');
+    else item.removeAttribute('aria-current');
+  });
+}
+
+function applyHomeScrollOnLoad() {
+  if (!isHomePath()) return;
+
+  const navType = getNavigationType();
+  const resetScroll = shouldResetHomeScrollPosition();
+
+  if ((navType === 'reload' || navType === 'back_forward') && window.location.hash) {
+    history.replaceState(null, '', window.location.pathname + window.location.search);
+  }
+
+  if (resetScroll) {
+    scrollToHomeTop();
+    resetHomeTopNavState();
+    return;
+  }
+
+  requestAnimationFrame(() => {
+    const target = document.querySelector(window.location.hash);
+    target?.scrollIntoView({ block: 'start' });
+  });
+}
+
+function bindHomeReloadScroll() {
+  if (window.__homeReloadScrollBound) return;
+  window.__homeReloadScrollBound = true;
+  window.addEventListener('pageshow', (event) => {
+    if (!isHomePath()) return;
+    if (event.persisted) {
+      if (window.location.hash) {
+        history.replaceState(null, '', window.location.pathname + window.location.search);
+      }
+      scrollToHomeTop();
+      resetHomeTopNavState();
+      return;
+    }
+    applyHomeScrollOnLoad();
+  });
+}
+
+function hideHomeCoursesSection() {
+  document.querySelector('#courses')?.remove();
+  document.querySelector('.divider-courses')?.remove();
+}
+
 async function initHomePage() {
   const { showEmpty, bindFadeUp, bindCourseButtons, setSEO, escapeHtml } = window.SiteUtils;
   const C = window.SiteComponents;
 
   setSEO({
     title: 'پژوهش\u200cسرا | مرکز آموزش علوم و فناوری',
-    description: 'آموزش برنامه\u200cنویسی، رباتیک، هوش مصنوعی، المپیاد و تیزهوشان — پژوهش\u200cسرا',
+    description: 'آموزش برنامه\u200cنویسی، رباتیک، هوش مصنوعی، المپیاد و آکادمی — پژوهش\u200cسرا',
     canonical: window.location.origin + '/',
   });
+
+  applyHomeScrollOnLoad();
+  bindHomeReloadScroll();
 
   await loadCategories();
   C.initLayout(null);
   C.applySiteLogo();
+  applyHomeScrollOnLoad();
 
   const coursesTrack = document.querySelector('#courses .courses-track');
   const articlesTrack = document.querySelector('#articles .articles-track');
   const assocGrid = document.querySelector('#associations .assoc-grid');
-  const galleryMasonry = document.querySelector('#gallery .gallery-masonry');
-  const galleryFilters = document.querySelector('#gallery .gallery-filters');
+  const festGrid = document.querySelector('#festivals .fest-grid');
 
   try {
     const data = await apiFetch('/courses/?limit=6');
     const courses = data.results || data;
     if (courses.length) {
       coursesTrack.innerHTML = courses.map((course, index) => C.renderCourseCard(course, index, { compact: true })).join('');
+      C.bindThumbFallbacks(coursesTrack);
       bindCourseButtons(coursesTrack);
       bindCoursesReel();
     } else {
-      showEmpty(coursesTrack, 'هنوز دوره\u200cای ثبت نشده است.');
+      hideHomeCoursesSection();
     }
   } catch {
-    showEmpty(coursesTrack, 'خطا در بارگذاری دوره\u200cها.');
+    if (coursesTrack) {
+      showEmpty(coursesTrack, 'خطا در بارگذاری دوره\u200cها. سرور را بررسی کنید و صفحه را رفرش کنید.');
+    }
   }
 
   try {
@@ -123,6 +203,7 @@ async function initHomePage() {
     const articles = data.results || data;
     if (articles.length) {
       articlesTrack.innerHTML = articles.map(C.renderArticleCard).join('');
+      C.bindThumbFallbacks(articlesTrack);
       bindArticlesReel();
       bindFadeUp(document.querySelector('#articles'));
     } else {
@@ -145,28 +226,21 @@ async function initHomePage() {
   }
 
   try {
-    const data = await apiFetch('/gallery/images/?limit=12');
-    const items = data.results || data;
-    if (items.length) {
-      if (galleryFilters) {
-        const cats = [...new Map(items.filter((i) => i.category_slug).map((i) => [i.category_slug, i.category_title])).entries()];
-        galleryFilters.innerHTML =
-          `<button class="gallery-filter active" onclick="filterGallery(this, 'all')" aria-pressed="true">همه</button>` +
-          cats.map(([slug, title]) =>
-            `<button class="gallery-filter" onclick="filterGallery(this, '${slug}')" aria-pressed="false">${escapeHtml(title)}</button>`
-          ).join('');
-      }
-      galleryMasonry.innerHTML = items.map(C.renderGalleryItem).join('');
+    const data = await apiFetch('/festivals/');
+    const festivals = data.results || data;
+    if (festivals.length) {
+      festGrid.innerHTML = festivals.map(C.renderFestivalCard).join('');
     } else {
-      showEmpty(galleryMasonry, 'هنوز تصویری در گالری ثبت نشده است.');
+      showEmpty(festGrid, 'هنوز جشنواره\u200cای ثبت نشده است.');
     }
   } catch {
-    showEmpty(galleryMasonry, 'خطا در بارگذاری گالری.');
+    showEmpty(festGrid, 'خطا در بارگذاری جشنواره\u200cها.');
   }
 
   bindFadeUp(document);
   initPageScripts();
-  loadSettings();
+  loadSettings().then(() => applyHomeScrollOnLoad());
+  requestAnimationFrame(() => applyHomeScrollOnLoad());
 }
 
 async function initCoursesPage(activeCategory) {
@@ -256,11 +330,24 @@ async function initCourseDetailPage(slug) {
     const course = await apiFetch(`/courses/${encodeURIComponent(slug)}/`);
     const categoryTitle = course.category?.title || '';
     const pageTitle = `${course.title} | پژوهش\u200cسرا`;
-    const PLACEHOLDER_EMOJIS = window.SiteUtils.PLACEHOLDER_EMOJIS;
-    const emoji = PLACEHOLDER_EMOJIS[course.id % PLACEHOLDER_EMOJIS.length];
     const hero = course.image
-      ? `<img class="course-hero-img" src="${mediaUrl(course.image)}" alt="${escapeHtml(course.title)}">`
-      : `<div class="course-hero-placeholder" aria-hidden="true">${emoji}</div>`;
+      ? `<img class="course-hero-img" src="${mediaUrl(course.image)}" alt="${escapeHtml(course.title)}" data-course-thumb-fallback>`
+      : C.courseHeroPlaceholder();
+    const scheduleText = (course.schedule || '').trim();
+    const registrationClosed = course.registration_open === false;
+    const deadlineLine = course.registration_deadline_jalali
+      ? `<li><span>فرصت ثبت\u200cنام تا</span><span>${escapeHtml(course.registration_deadline_jalali)}</span></li>`
+      : '';
+    const scheduleSection = `
+      <section class="course-schedule" aria-labelledby="course-schedule-heading">
+        <h2 class="course-schedule-title" id="course-schedule-heading">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          روزها و ساعت برگزاری
+        </h2>
+        <div class="schedule-box">${scheduleText
+          ? escapeHtml(scheduleText).replace(/\n/g, '<br>')
+          : '<span class="schedule-placeholder">زمان برگزاری به\u200cزودی از طریق پنل مدیریت اعلام می\u200cشود.</span>'}</div>
+      </section>`;
 
     setSEO({
       title: pageTitle,
@@ -298,22 +385,26 @@ async function initCourseDetailPage(slug) {
               </div>
               <h1 class="course-title">${escapeHtml(course.title)}</h1>
               <p class="course-desc">${escapeHtml(course.description || '')}</p>
+              ${scheduleSection}
             </div>
           </div>
           <aside class="course-sidebar">
             <div class="price-box">${formatPrice(course.price)}</div>
             <ul class="info-list">
               <li><span>ظرفیت باقی\u200cمانده</span><span>${course.remaining_capacity ?? 0} نفر</span></li>
-              <li><span>تاریخ شروع</span><span>${formatDate(course.start_date)}</span></li>
-              <li><span>تاریخ پایان</span><span>${formatDate(course.end_date)}</span></li>
+              <li><span>تاریخ شروع</span><span>${escapeHtml(course.start_date_jalali || formatDate(course.start_date))}</span></li>
+              <li><span>تاریخ پایان</span><span>${escapeHtml(course.end_date_jalali || formatDate(course.end_date))}</span></li>
               <li><span>گروه سنی</span><span>${escapeHtml(window.SiteUtils.AGE_LABELS[course.age_group] || course.age_group)}</span></li>
+              ${deadlineLine}
+              ${scheduleText ? `<li><span>زمان برگزاری</span><span>${escapeHtml(scheduleText).replace(/\n/g, ' · ')}</span></li>` : ''}
             </ul>
-            <button type="button" class="btn-enroll" data-course-id="${course.id}" ${course.is_full ? 'disabled' : ''}>
-              ${course.is_full ? 'ظرفیت تکمیل شده' : 'ثبت\u200cنام در دوره'}
+            <button type="button" class="btn-enroll" data-enroll-course="${course.id}" ${course.is_full || registrationClosed ? 'disabled' : ''}>
+              ${registrationClosed ? 'مهلت ثبت\u200cنام تمام شده' : course.is_full ? 'ظرفیت تکمیل شده' : 'ثبت\u200cنام در دوره'}
             </button>
           </aside>
         </div>`;
       bindCourseButtons(container);
+      C.bindThumbFallbacks(container);
     }
   } catch {
     setSEO({ title: 'دوره یافت نشد | پژوهش\u200cسرا' });
@@ -366,11 +457,9 @@ async function initArticleDetailPage(slug) {
     const article = await apiFetch(`/articles/${encodeURIComponent(slug)}/`);
     const categoryTitle = article.category?.title || '';
     const pageTitle = `${article.title} | پژوهش\u200cسرا`;
-    const PLACEHOLDER_EMOJIS = window.SiteUtils.PLACEHOLDER_EMOJIS;
-    const emoji = PLACEHOLDER_EMOJIS[article.id % PLACEHOLDER_EMOJIS.length];
     const hero = article.image
-      ? `<img class="article-hero-img" src="${mediaUrl(article.image)}" alt="${escapeHtml(article.title)}">`
-      : `<div class="article-hero-placeholder" aria-hidden="true">${emoji}</div>`;
+      ? `<img class="article-hero-img" src="${mediaUrl(article.image)}" alt="${escapeHtml(article.title)}" data-article-thumb-fallback>`
+      : C.articleHeroPlaceholder();
 
     setSEO({
       title: pageTitle,
@@ -401,6 +490,7 @@ async function initArticleDetailPage(slug) {
           ${article.excerpt ? `<p class="article-excerpt">${escapeHtml(article.excerpt)}</p>` : ''}
           <div class="article-body">${escapeHtml(article.content || '')}</div>
         </article>`;
+      C.bindThumbFallbacks(container);
     }
   } catch {
     setSEO({ title: 'مقاله یافت نشد | پژوهش\u200cسرا' });
@@ -411,6 +501,75 @@ async function initArticleDetailPage(slug) {
 
   initPageScripts();
   loadSettings();
+}
+
+async function initContentDetailPage({ apiPath, listPath, listLabel, notFoundLabel, containerSelector, iconType }) {
+  const { setSEO, escapeHtml } = window.SiteUtils;
+  const C = window.SiteComponents;
+  const container = document.querySelector(containerSelector);
+  const page = window.SiteUtils.getPageType();
+  const slug = page.slug;
+
+  await loadCategories();
+  C.initLayout(null);
+  C.applySiteLogo();
+
+  try {
+    const item = await apiFetch(`${apiPath}${encodeURIComponent(slug)}/`);
+    const pageTitle = `${item.title} | پژوهش\u200cسرا`;
+    const hero = C.renderTopicHeroIcon(item, iconType);
+
+    setSEO({
+      title: pageTitle,
+      description: item.description?.slice(0, 160) || pageTitle,
+      canonical: `${window.location.origin}${window.location.pathname}`,
+    });
+
+    if (container) {
+      container.innerHTML = `
+        <nav class="breadcrumb" aria-label="مسیر">
+          <a href="/">صفحه اصلی</a> ›
+          <a href="${listPath}">${escapeHtml(listLabel)}</a> ›
+          <span>${escapeHtml(item.title)}</span>
+        </nav>
+        <div class="content-hero">${hero}</div>
+        <article class="content-body">
+          <h1 class="content-title">${escapeHtml(item.title)}</h1>
+          ${item.description ? `<p class="content-excerpt">${escapeHtml(item.description)}</p>` : ''}
+          <div class="content-text">${escapeHtml(item.content || '')}</div>
+        </article>`;
+    }
+  } catch {
+    setSEO({ title: `${notFoundLabel} | پژوهش\u200cسرا` });
+    if (container) {
+      container.innerHTML = `<div class="empty-state">${escapeHtml(notFoundLabel)}. <a href="${listPath}">بازگشت</a></div>`;
+    }
+  }
+
+  initPageScripts();
+  loadSettings();
+}
+
+async function initAssociationDetailPage(slug) {
+  await initContentDetailPage({
+    apiPath: '/associations/',
+    listPath: '/#associations',
+    listLabel: 'انجمن\u200cها',
+    notFoundLabel: 'انجمن مورد نظر یافت نشد',
+    containerSelector: '[data-association-detail]',
+    iconType: 'association',
+  });
+}
+
+async function initFestivalDetailPage(slug) {
+  await initContentDetailPage({
+    apiPath: '/festivals/',
+    listPath: '/#festivals',
+    listLabel: 'جشنواره\u200cها',
+    notFoundLabel: 'جشنواره مورد نظر یافت نشد',
+    containerSelector: '[data-festival-detail]',
+    iconType: 'festival',
+  });
 }
 
 function initPageScripts() {
@@ -445,6 +604,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     await initArticleDetailPage(page.slug);
   } else if (page.type === 'articles') {
     await initArticlesPage();
+  } else if (page.type === 'association') {
+    await initAssociationDetailPage(page.slug);
+  } else if (page.type === 'festival') {
+    await initFestivalDetailPage(page.slug);
   } else {
     await initHomePage();
   }

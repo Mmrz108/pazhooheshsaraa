@@ -15,6 +15,8 @@ env = environ.Env(
     JWT_ACCESS_TOKEN_LIFETIME_MINUTES=(int, 60),
     JWT_REFRESH_TOKEN_LIFETIME_DAYS=(int, 7),
     ZARINPAL_SANDBOX=(bool, True),
+    PAYMENT_GATEWAY_ENABLED=(bool, True),
+    PAYMENT_DIRECT_REDIRECT=(bool, True),
 )
 
 environ.Env.read_env(BASE_DIR / '.env')
@@ -152,15 +154,25 @@ TEMPLATES = [
 WSGI_APPLICATION = 'pazhooheshsaraa.wsgi.application'
 ASGI_APPLICATION = 'pazhooheshsaraa.asgi.application'
 
-_use_sqlite = env.bool('USE_SQLITE', default=False)
-if _on_liara or not DEBUG:
-    _use_sqlite = False
+_use_sqlite = env.bool('USE_SQLITE', default=True)
 
 if _use_sqlite:
+    _sqlite_db = _env_or('SQLITE_DB_PATH')
+    if _sqlite_db:
+        _db_path = Path(_sqlite_db)
+    elif _on_liara:
+        _data_dir = Path(_env_or('LIARA_DATA_DIR', 'LIARA_DISK_PATH', default='data'))
+        if not _data_dir.is_absolute():
+            _data_dir = BASE_DIR / _data_dir
+        _db_path = _data_dir / 'db.sqlite3'
+    else:
+        _db_path = BASE_DIR / 'db.sqlite3'
+    if not _on_liara:
+        _db_path.parent.mkdir(parents=True, exist_ok=True)
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
+            'NAME': _db_path,
         }
     }
 else:
@@ -168,7 +180,7 @@ else:
     DATABASES = {
         'default': _postgres_env_config(allow_localhost_defaults=_allow_localhost),
     }
-# Production DB config is validated at runtime in liara_pre_start.sh (not at import),
+# DB config for Liara is validated at runtime in liara_pre_start.sh (not at import),
 # because Liara runs collectstatic at build time without runtime env vars.
 
 AUTH_USER_MODEL = 'users.User'
@@ -185,7 +197,14 @@ USE_TZ = True
 STATIC_URL = env('STATIC_URL', default='/static/')
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = env('MEDIA_URL', default='/media/')
-MEDIA_ROOT = BASE_DIR / 'media'
+_media_root_env = _env_or('MEDIA_ROOT')
+if _media_root_env:
+    _mre = Path(_media_root_env)
+    MEDIA_ROOT = _mre if _mre.is_absolute() else BASE_DIR / _mre
+else:
+    MEDIA_ROOT = BASE_DIR / 'media'
+    if not _on_liara:
+        MEDIA_ROOT.mkdir(parents=True, exist_ok=True)
 FRONTEND_DIR = BASE_DIR / 'frontend'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -216,7 +235,7 @@ CORS_ALLOW_CREDENTIALS = True
 # DRF
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'common.authentication.LenientJWTAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
@@ -226,13 +245,13 @@ REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
     ),
-    'DEFAULT_THROTTLE_CLASSES': [
+    'DEFAULT_THROTTLE_CLASSES': [] if DEBUG else [
         'rest_framework.throttling.AnonRateThrottle',
         'rest_framework.throttling.UserRateThrottle',
     ],
     'DEFAULT_THROTTLE_RATES': {
-        'anon': '100/hour',
-        'user': '1000/hour',
+        'anon': '1000/hour',
+        'user': '5000/hour',
         'otp': '1000/hour' if DEBUG else '10/hour',
     },
 }
@@ -289,6 +308,12 @@ BALE_GATEWAY_OTP_URL = env(
 )
 
 # Payment
+PAYMENT_GATEWAY = env('PAYMENT_GATEWAY', default='melli_new')
+PAYMENT_GATEWAY_ENABLED = env.bool('PAYMENT_GATEWAY_ENABLED', default=True)
+PAYMENT_DIRECT_REDIRECT = env.bool('PAYMENT_DIRECT_REDIRECT', default=True)
+SADAD_MERCHANT_ID = env('SADAD_MERCHANT_ID', default='')
+SADAD_TERMINAL_ID = env('SADAD_TERMINAL_ID', default='')
+SADAD_TERMINAL_KEY = env('SADAD_TERMINAL_KEY', default='')
 ZARINPAL_MERCHANT_ID = env('ZARINPAL_MERCHANT_ID', default='')
 ZARINPAL_SANDBOX = env('ZARINPAL_SANDBOX')
 PAYMENT_CALLBACK_URL = env(
@@ -299,6 +324,8 @@ PAYMENT_CALLBACK_URL = env(
         else 'http://localhost:8000/api/payments/verify/'
     ),
 )
+PAYMENT_SUCCESS_REDIRECT_URL = env('PAYMENT_SUCCESS_REDIRECT_URL', default='/courses/')
+PAYMENT_FAILED_REDIRECT_URL = env('PAYMENT_FAILED_REDIRECT_URL', default='/courses/?payment=failed')
 
 # Celery
 CELERY_BROKER_URL = env('CELERY_BROKER_URL', default='redis://localhost:6379/1')
