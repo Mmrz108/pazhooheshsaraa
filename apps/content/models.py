@@ -109,6 +109,34 @@ class Festival(models.Model):
         super().save(*args, **kwargs)
 
 
+class Academy(models.Model):
+    title = models.CharField('عنوان', max_length=255)
+    slug = models.SlugField('اسلاگ', max_length=255, unique=True, allow_unicode=True)
+    description = models.TextField('خلاصه', help_text='متن کوتاه برای کارت آکادمی')
+    content = models.TextField('محتوای صفحه', blank=True, help_text='متن کامل صفحه جزئیات')
+    image = models.ImageField('تصویر', upload_to='academies/', blank=True, null=True)
+    order = models.PositiveIntegerField('ترتیب', default=0)
+    is_active = models.BooleanField('فعال', default=True)
+
+    class Meta:
+        verbose_name = 'برنامه آکادمی'
+        verbose_name_plural = 'برنامه‌های آکادمی'
+        ordering = ['order', 'title']
+
+    def __str__(self):
+        return self.title
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title, allow_unicode=True)
+        if not self.content:
+            self.content = (
+                f'برنامه {self.title} بخشی از آکادمی پژوهش\u200cسرا است. '
+                f'اطلاعات ثبت\u200cنام، زمان\u200cبندی و جزئیات از طریق این صفحه اطلاع\u200cرسانی می\u200cشود.'
+            )
+        super().save(*args, **kwargs)
+
+
 class GalleryCategory(models.Model):
     title = models.CharField('عنوان', max_length=255)
     slug = models.SlugField('اسلاگ', max_length=255, unique=True, allow_unicode=True)

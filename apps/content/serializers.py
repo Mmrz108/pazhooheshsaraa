@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from apps.content.models import (
+    Academy,
     Article,
     ArticleCategory,
     Association,
@@ -82,6 +83,28 @@ class FestivalSerializer(serializers.ModelSerializer):
 class FestivalDetailSerializer(FestivalSerializer):
     class Meta(FestivalSerializer.Meta):
         fields = FestivalSerializer.Meta.fields + ['content']
+
+
+class AcademySerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Academy
+        fields = ['id', 'title', 'slug', 'description', 'image']
+
+    def get_image(self, obj):
+        if not obj.image:
+            return None
+        request = self.context.get('request')
+        url = obj.image.url
+        if request and not url.startswith('http'):
+            return request.build_absolute_uri(url)
+        return url
+
+
+class AcademyDetailSerializer(AcademySerializer):
+    class Meta(AcademySerializer.Meta):
+        fields = AcademySerializer.Meta.fields + ['content']
 
 
 class GalleryImageSerializer(serializers.ModelSerializer):

@@ -474,6 +474,7 @@
   .eyebrow-categories { background: linear-gradient(135deg, #DBEAFE, #EDE9FE); color: #1D4ED8; border-color: #BFDBFE; }
   .eyebrow-courses { background: linear-gradient(135deg, #E0E7FF, #DBEAFE); color: #4338CA; border-color: #C7D2FE; }
   .eyebrow-associations { background: linear-gradient(135deg, #D1FAE5, #CCFBF1); color: #047857; border-color: #A7F3D0; }
+  .eyebrow-academies { background: linear-gradient(135deg, #E0E7FF, #EDE9FE); color: #4338CA; border-color: #C7D2FE; }
   .eyebrow-festivals { background: linear-gradient(135deg, #FFEDD5, #FCE7F3); color: #C2410C; border-color: #FDBA74; }
   .eyebrow-articles { background: linear-gradient(135deg, #EDE9FE, #E0E7FF); color: #6D28D9; border-color: #DDD6FE; }
   .eyebrow-about { background: linear-gradient(135deg, #E0F2FE, #F0F9FF); color: #0369A1; border-color: #BAE6FD; }
@@ -1102,6 +1103,73 @@
   .fest-title { font-size: 0.82rem; font-weight: 700; color: var(--text); margin-bottom: 0.35rem; }
   .fest-desc { font-size: 0.7rem; color: var(--text-muted); line-height: 1.5; }
 
+  /* ─── ACADEMIES ───────────────────────────────────── */
+  .academy-section {
+    background: linear-gradient(180deg, #EEF2FF 0%, #F5F3FF 55%, #FFFFFF 100%);
+    position: relative;
+  }
+
+  .academy-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 30% 30%, rgba(99,102,241,0.08), transparent 42%),
+                radial-gradient(circle at 80% 70%, rgba(139,92,246,0.06), transparent 40%);
+    pointer-events: none;
+  }
+
+  .academy-section .container { position: relative; z-index: 1; }
+
+  .academy-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  @media(min-width: 640px) { .academy-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media(min-width: 900px) { .academy-grid { grid-template-columns: repeat(4, 1fr); } }
+
+  .academy-card {
+    border-radius: var(--card-radius);
+    padding: 1.25rem 1rem;
+    text-align: center;
+    transition: var(--transition);
+    text-decoration: none;
+    display: block;
+    color: inherit;
+  }
+
+  .academy-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.1); }
+
+  .academy-card-1 { background: linear-gradient(135deg, #EEF2FF, #E0E7FF); border: 1.5px solid #A5B4FC; }
+  .academy-card-2 { background: linear-gradient(135deg, #F5F3FF, #EDE9FE); border: 1.5px solid #C4B5FD; }
+  .academy-card-3 { background: linear-gradient(135deg, #ECFEFF, #CFFAFE); border: 1.5px solid #67E8F9; }
+  .academy-card-4 { background: linear-gradient(135deg, #FDF4FF, #FAE8FF); border: 1.5px solid #E879F9; }
+  .academy-card-5 { background: linear-gradient(135deg, #EFF6FF, #DBEAFE); border: 1.5px solid #93C5FD; }
+  .academy-card-6 { background: linear-gradient(135deg, #F0FDF4, #DCFCE7); border: 1.5px solid #86EFAC; }
+  .academy-card-7 { background: linear-gradient(135deg, #FFF7ED, #FFEDD5); border: 1.5px solid #FDBA74; }
+
+  .academy-icon-wrap {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 0.6rem;
+    background: rgba(255,255,255,0.55);
+  }
+
+  .academy-card-1 .academy-icon-wrap { color: #4338CA; }
+  .academy-card-2 .academy-icon-wrap { color: #7C3AED; }
+  .academy-card-3 .academy-icon-wrap { color: #0891B2; }
+  .academy-card-4 .academy-icon-wrap { color: #C026D3; }
+  .academy-card-5 .academy-icon-wrap { color: #1D4ED8; }
+  .academy-card-6 .academy-icon-wrap { color: #15803D; }
+  .academy-card-7 .academy-icon-wrap { color: #C2410C; }
+  .academy-title { font-size: 0.82rem; font-weight: 700; color: var(--text); margin-bottom: 0.35rem; }
+  .academy-desc { font-size: 0.7rem; color: var(--text-muted); line-height: 1.5; }
+
   /* ─── ARTICLES ────────────────────────────────────── */
   .articles-section {
     background: linear-gradient(180deg, #F5F3FF 0%, #EEF2FF 55%, #FAFAFA 100%);
@@ -1434,6 +1502,16 @@
     margin: 0;
   }
 
+  .footer-credit a {
+    color: rgba(255,255,255,0.35);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .footer-credit a:hover {
+    color: rgba(255,255,255,0.75);
+  }
+
   /* ─── BOTTOM NAV ──────────────────────────────────── */
   .bottom-nav {
     position: fixed;
@@ -1504,6 +1582,12 @@
   /* ─── UTILITY ─────────────────────────────────────── */
   .pb-safe { padding-bottom: calc(70px + env(safe-area-inset-bottom)); }
 
+  .page-end-anchor {
+    display: block;
+    height: 0;
+    scroll-margin-bottom: calc(70px + env(safe-area-inset-bottom));
+  }
+
   @media(min-width: 768px) { .pb-safe { padding-bottom: 0; } }
 
   .view-all {
@@ -1541,6 +1625,7 @@
 
   .divider-courses { background: linear-gradient(90deg, transparent, rgba(67,56,202,0.3), rgba(99,102,241,0.25), transparent); }
   .divider-assoc { background: linear-gradient(90deg, transparent, rgba(16,185,129,0.3), rgba(20,184,166,0.25), transparent); }
+  .divider-academy { background: linear-gradient(90deg, transparent, rgba(99,102,241,0.3), rgba(139,92,246,0.25), transparent); }
   .divider-fest { background: linear-gradient(90deg, transparent, rgba(249,115,22,0.3), rgba(236,72,153,0.25), transparent); }
   .divider-articles { background: linear-gradient(90deg, transparent, rgba(109,40,217,0.3), rgba(99,102,241,0.25), transparent); }
   .divider-about { background: linear-gradient(90deg, transparent, rgba(14,165,233,0.3), rgba(124,58,237,0.25), transparent); }
@@ -1725,6 +1810,26 @@
   </div>
 </section>
 
+<div class="divider-gradient divider-academy"></div>
+
+<!-- ACADEMIES -->
+<section class="section academy-section" id="academies" aria-labelledby="academy-heading">
+  <div class="container">
+    <div class="section-header fade-up">
+      <div class="section-eyebrow eyebrow-academies">
+        <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        آکادمی
+      </div>
+      <h2 class="section-title" id="academy-heading">آکادمی</h2>
+      <p class="section-sub">برنامه‌های تخصصی پرورشی، استعدادیابی، روانشناسی و مهارت‌های فردی</p>
+    </div>
+
+    <div class="academy-grid" role="list">
+      <div class="loading-state">در حال بارگذاری برنامه‌های آکادمی...</div>
+    </div>
+  </div>
+</section>
+
 <div class="divider-gradient divider-fest"></div>
 
 <!-- FESTIVALS -->
@@ -1813,7 +1918,7 @@
 </div>
 
 <!-- FOOTER -->
-<footer class="footer pb-safe" id="contact" role="contentinfo">
+<footer class="footer pb-safe" role="contentinfo">
   <div class="container">
     <div class="footer-grid">
 
@@ -1834,6 +1939,7 @@
           <li><a href="#"><span aria-hidden="true">›</span> صفحه اصلی</a></li>
           <li><a href="#courses"><span aria-hidden="true">›</span> دوره‌ها</a></li>
           <li><a href="#associations"><span aria-hidden="true">›</span> انجمن‌ها</a></li>
+          <li><a href="#academies"><span aria-hidden="true">›</span> آکادمی</a></li>
           <li><a href="#festivals"><span aria-hidden="true">›</span> جشنواره‌ها</a></li>
           <li><a href="#articles"><span aria-hidden="true">›</span> مقالات</a></li>
           <li><a href="#about"><span aria-hidden="true">›</span> درباره ما</a></li>
@@ -1877,10 +1983,11 @@
       </div>
     </div>
     <div class="footer-credit">
-      <p>طراح وبسایت : محمد میرزایی</p>
+      <p><a href="/designer/">طراح وبسایت : محمد میرزایی</a></p>
     </div>
   </div>
 </footer>
+<span id="contact" class="page-end-anchor" aria-hidden="true"></span>
 
 <!-- BOTTOM NAVIGATION -->
 <nav class="bottom-nav" aria-label="ناوبری پایین صفحه">
@@ -1923,20 +2030,6 @@
   }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
 
   document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
-
-  // Active bottom nav
-  const navItems = document.querySelectorAll('.bottom-nav-item');
-  navItems.forEach(item => {
-    item.addEventListener('click', function() {
-      navItems.forEach(i => { i.classList.remove('active'); i.removeAttribute('aria-current'); });
-      this.classList.add('active');
-      this.setAttribute('aria-current', 'page');
-      if (this.getAttribute('href') === '#contact') {
-        const footer = document.getElementById('contact');
-        footer?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    });
-  });
 
   // Scroll nav active
   const scrollLinks = document.querySelectorAll('.scroll-nav a');

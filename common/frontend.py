@@ -9,6 +9,7 @@ CATEGORY_PAGE_PATTERN = re.compile(r'^courses/([^/]+)/?$')
 COURSE_DETAIL_PATTERN = re.compile(r'^course/([^/]+)/?$')
 ARTICLE_DETAIL_PATTERN = re.compile(r'^articles/([^/]+)/?$')
 ASSOCIATION_DETAIL_PATTERN = re.compile(r'^associations/([^/]+)/?$')
+ACADEMY_DETAIL_PATTERN = re.compile(r'^academies/([^/]+)/?$')
 FESTIVAL_DETAIL_PATTERN = re.compile(r'^festivals/([^/]+)/?$')
 DEDICATED_PAGES = {
     'login': 'login-redirect.html',
@@ -21,6 +22,8 @@ DEDICATED_PAGES = {
     'dashboard.html': 'dashboard.html',
     'site-management': 'site-management.html',
     'site-management.html': 'site-management.html',
+    'designer': 'designer.html',
+    'designer.html': 'designer.html',
 }
 
 
@@ -43,6 +46,8 @@ class FrontendView(View):
             file_path = frontend_dir / 'article.html'
         elif ASSOCIATION_DETAIL_PATTERN.match(path):
             file_path = frontend_dir / 'association.html'
+        elif ACADEMY_DETAIL_PATTERN.match(path):
+            file_path = frontend_dir / 'academy.html'
         elif FESTIVAL_DETAIL_PATTERN.match(path):
             file_path = frontend_dir / 'festival.html'
         elif path in DEDICATED_PAGES:
@@ -68,6 +73,8 @@ class FrontendView(View):
                     file_path = frontend_dir / 'article.html'
                 elif ASSOCIATION_DETAIL_PATTERN.match(path.split('/')[0] if '/' in path else path):
                     file_path = frontend_dir / 'association.html'
+                elif ACADEMY_DETAIL_PATTERN.match(path.split('/')[0] if '/' in path else path):
+                    file_path = frontend_dir / 'academy.html'
                 elif FESTIVAL_DETAIL_PATTERN.match(path.split('/')[0] if '/' in path else path):
                     file_path = frontend_dir / 'festival.html'
                 elif CATEGORY_PAGE_PATTERN.match(path.split('/')[0] if '/' in path else path):

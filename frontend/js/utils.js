@@ -69,8 +69,13 @@ function getPageType() {
   const associationMatch = path.match(/^\/associations\/([^/]+)$/i);
   if (associationMatch) return { type: 'association', slug: decodeURIComponent(associationMatch[1]) };
 
+  const academyMatch = path.match(/^\/academies\/([^/]+)$/i);
+  if (academyMatch) return { type: 'academy', slug: decodeURIComponent(academyMatch[1]) };
+
   const festivalMatch = path.match(/^\/festivals\/([^/]+)$/i);
   if (festivalMatch) return { type: 'festival', slug: decodeURIComponent(festivalMatch[1]) };
+
+  if (path === '/designer') return { type: 'designer' };
 
   return { type: 'home' };
 }
@@ -197,10 +202,57 @@ function bindCourseButtons(container) {
   });
 }
 
+function scrollToSiteEnd(behavior = 'smooth') {
+  const top = Math.max(
+    document.documentElement.scrollHeight,
+    document.body.scrollHeight,
+  ) - window.innerHeight;
+  window.scrollTo({ top: Math.max(0, top), behavior });
+}
+
+function bindContactLinks() {
+  if (window.__contactLinksBound) return;
+  window.__contactLinksBound = true;
+
+  document.querySelectorAll('a[href="#contact"]:not(.bottom-nav-item)').forEach((link) => {
+    link.addEventListener('click', (event) => {
+      event.preventDefault();
+      scrollToSiteEnd();
+      history.replaceState(null, '', '#contact');
+    });
+  });
+}
+
+function bindBottomNav() {
+  if (window.__bottomNavBound) return;
+  window.__bottomNavBound = true;
+
+  const navItems = document.querySelectorAll('.bottom-nav-item');
+  if (!navItems.length) return;
+
+  navItems.forEach((item) => {
+    item.addEventListener('click', function (event) {
+      if (this.getAttribute('href') === '#contact') {
+        event.preventDefault();
+        scrollToSiteEnd();
+        history.replaceState(null, '', '#contact');
+      }
+
+      navItems.forEach((navItem) => {
+        navItem.classList.remove('active');
+        navItem.removeAttribute('aria-current');
+      });
+      this.classList.add('active');
+      this.setAttribute('aria-current', 'page');
+    });
+  });
+}
+
 window.SiteUtils = {
   SITE_LOGO, SITE_NAME, SITE_TAGLINE,
   LEVEL_LABELS, AGE_LABELS, BADGE_CLASSES, PLACEHOLDER_EMOJIS,
   formatPrice, formatDate, mediaUrl, escapeHtml,
   getPageType, setSEO, showEmpty, bindFadeUp, bindCourseButtons, enrollCourse,
   resumePendingEnrollment, setPendingEnrollment, getPendingEnrollment, startCoursePayment,
+  scrollToSiteEnd, bindContactLinks, bindBottomNav,
 };

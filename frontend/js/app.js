@@ -131,6 +131,10 @@ function applyHomeScrollOnLoad() {
   }
 
   requestAnimationFrame(() => {
+    if (window.location.hash === '#contact') {
+      window.SiteUtils.scrollToSiteEnd('auto');
+      return;
+    }
     const target = document.querySelector(window.location.hash);
     target?.scrollIntoView({ block: 'start' });
   });
@@ -179,6 +183,7 @@ async function initHomePage() {
   const coursesTrack = document.querySelector('#courses .courses-track');
   const articlesTrack = document.querySelector('#articles .articles-track');
   const assocGrid = document.querySelector('#associations .assoc-grid');
+  const academyGrid = document.querySelector('#academies .academy-grid');
   const festGrid = document.querySelector('#festivals .fest-grid');
 
   try {
@@ -223,6 +228,18 @@ async function initHomePage() {
     }
   } catch {
     showEmpty(assocGrid, 'خطا در بارگذاری انجمن\u200cها.');
+  }
+
+  try {
+    const data = await apiFetch('/academies/');
+    const academies = data.results || data;
+    if (academies.length) {
+      academyGrid.innerHTML = academies.map(C.renderAcademyCard).join('');
+    } else {
+      showEmpty(academyGrid, 'هنوز برنامه آکادمی ثبت نشده است.');
+    }
+  } catch {
+    showEmpty(academyGrid, 'خطا در بارگذاری برنامه\u200cهای آکادمی.');
   }
 
   try {
@@ -561,6 +578,17 @@ async function initAssociationDetailPage(slug) {
   });
 }
 
+async function initAcademyDetailPage(slug) {
+  await initContentDetailPage({
+    apiPath: '/academies/',
+    listPath: '/#academies',
+    listLabel: 'آکادمی',
+    notFoundLabel: 'برنامه آکادمی مورد نظر یافت نشد',
+    containerSelector: '[data-academy-detail]',
+    iconType: 'academy',
+  });
+}
+
 async function initFestivalDetailPage(slug) {
   await initContentDetailPage({
     apiPath: '/festivals/',
@@ -573,6 +601,9 @@ async function initFestivalDetailPage(slug) {
 }
 
 function initPageScripts() {
+  window.SiteUtils.bindContactLinks();
+  window.SiteUtils.bindBottomNav();
+
   document.querySelectorAll('.fade-up').forEach((el) => {
     if (!el.classList.contains('visible')) {
       const observer = new IntersectionObserver((entries) => {
@@ -606,8 +637,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     await initArticlesPage();
   } else if (page.type === 'association') {
     await initAssociationDetailPage(page.slug);
+  } else if (page.type === 'academy') {
+    await initAcademyDetailPage(page.slug);
   } else if (page.type === 'festival') {
     await initFestivalDetailPage(page.slug);
+  } else if (page.type === 'designer') {
+    /* static page — no init needed */
   } else {
     await initHomePage();
   }

@@ -4,8 +4,18 @@ from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.content.models import Article, Association, Festival, GalleryCategory, GalleryImage, SiteSettings
+from apps.content.models import (
+    Academy,
+    Article,
+    Association,
+    Festival,
+    GalleryCategory,
+    GalleryImage,
+    SiteSettings,
+)
 from apps.content.serializers import (
+    AcademyDetailSerializer,
+    AcademySerializer,
     ArticleDetailSerializer,
     ArticleListSerializer,
     AssociationDetailSerializer,
@@ -91,6 +101,27 @@ class FestivalDetailView(generics.RetrieveAPIView):
             return self.get_queryset().get(slug=self.kwargs['slug'])
         except Festival.DoesNotExist as exc:
             raise NotFound('جشنواره یافت نشد.') from exc
+
+
+class AcademyListView(generics.ListAPIView):
+    permission_classes = [permissions.AllowAny]
+    serializer_class = AcademySerializer
+    queryset = Academy.objects.filter(is_active=True)
+
+
+class AcademyDetailView(generics.RetrieveAPIView):
+    permission_classes = [permissions.AllowAny]
+    serializer_class = AcademyDetailSerializer
+    lookup_field = 'slug'
+
+    def get_queryset(self):
+        return Academy.objects.filter(is_active=True)
+
+    def get_object(self):
+        try:
+            return self.get_queryset().get(slug=self.kwargs['slug'])
+        except Academy.DoesNotExist as exc:
+            raise NotFound('برنامه آکادمی یافت نشد.') from exc
 
 
 class GalleryListView(generics.ListAPIView):

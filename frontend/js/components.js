@@ -11,7 +11,7 @@ const DEFAULT_COURSE_CATEGORIES = [
 const NAV_ITEMS = [
   { type: 'course', slug: 'extracurricular', title: 'فوق برنامه' },
   { type: 'course', slug: 'gifted', title: 'تیزهوشان' },
-  { type: 'course', slug: 'academy', title: 'آکادمی' },
+  { type: 'anchor', href: '#academies', title: 'آکادمی' },
   { type: 'course', slug: 'olympiad', title: 'المپیاد' },
   { type: 'course', slug: 'support', title: 'تقویتی' },
   { type: 'anchor', href: '#associations', title: 'انجمن\u200cها' },
@@ -266,6 +266,12 @@ const TOPIC_ICON_PATHS = {
   flask: '<path d="M10 2v6.3a4 4 0 0 0 .9 2.5L18 20a2 2 0 0 1-1.8 3H7.8A2 2 0 0 1 6 20l7.1-9.2a4 4 0 0 0 .9-2.5V2"/><line x1="9" y1="2" x2="15" y2="2"/>',
   transport: '<path d="M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M5 17H3v-6l2-5h9l4 5h1a2 2 0 0 1 2 2v4h-2"/><path d="M9 17h6"/>',
   festival: '<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/>',
+  project: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>',
+  star: '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
+  brain: '<path d="M9.5 2A5.5 5.5 0 0 0 4 7.5c0 1.2.4 2.3 1 3.2A5.5 5.5 0 0 0 9.5 22a5.5 5.5 0 0 0 5.5-5.5c0-1.2-.4-2.3-1-3.2A5.5 5.5 0 0 0 9.5 2z"/><path d="M14.5 2A5.5 5.5 0 0 1 20 7.5c0 1.2-.4 2.3-1 3.2A5.5 5.5 0 0 1 14.5 22"/>',
+  briefcase: '<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>',
+  lightbulb: '<path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"/>',
+  heart: '<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>',
   math: '<line x1="5" y1="8" x2="19" y2="8"/><path d="M7 4l10 16"/><path d="M17 4L7 20"/>',
   physics: '<circle cx="12" cy="12" r="2"/><ellipse cx="12" cy="12" rx="9" ry="3.5"/><ellipse cx="12" cy="12" rx="9" ry="3.5" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="9" ry="3.5" transform="rotate(120 12 12)"/>',
   chemistry: '<path d="M9 3h6"/><path d="M10 3v6.8L4.8 18.2a1 1 0 0 0 .9 1.5h12.6a1 1 0 0 0 .9-1.5L14 9.8V3"/><circle cx="10" cy="16" r="1"/><circle cx="14.5" cy="15" r="0.8"/>',
@@ -281,6 +287,17 @@ const FESTIVAL_ICON_BY_SLUG = {
   nano: 'nano',
   laboratory: 'flask',
   transport: 'transport',
+};
+
+const ACADEMY_ICON_BY_SLUG = {
+  nurturing: 'heart',
+  projects: 'project',
+  'talent-discovery': 'star',
+  psychology: 'brain',
+  entrepreneurship: 'briefcase',
+  'academic-counseling': 'book',
+  creativity: 'lightbulb',
+  'social-skills': 'heart',
 };
 
 function topicIconSvg(key, size = 28) {
@@ -317,6 +334,20 @@ function festivalIconKey(item) {
   return 'festival';
 }
 
+function academyIconKey(item) {
+  const slug = (item.slug || '').toLowerCase();
+  if (ACADEMY_ICON_BY_SLUG[slug]) return ACADEMY_ICON_BY_SLUG[slug];
+  const title = item.title || '';
+  if (/پروژه|project/i.test(title)) return 'project';
+  if (/استعداد|talent/i.test(title)) return 'star';
+  if (/روان|psych/i.test(title)) return 'brain';
+  if (/کارآفرین|entrepreneur/i.test(title)) return 'briefcase';
+  if (/مشاوره|counsel/i.test(title)) return 'book';
+  if (/خلاق|نوآور|creativ/i.test(title)) return 'lightbulb';
+  if (/اجتماع|social/i.test(title)) return 'heart';
+  return 'star';
+}
+
 function renderAssociationIcon(item) {
   const key = associationIconKey(item);
   return `<div class="assoc-icon-wrap" aria-hidden="true">${topicIconSvg(key)}</div>`;
@@ -327,10 +358,19 @@ function renderFestivalIcon(item) {
   return `<div class="fest-icon-wrap" aria-hidden="true">${topicIconSvg(key)}</div>`;
 }
 
+function renderAcademyIcon(item) {
+  const key = academyIconKey(item);
+  return `<div class="academy-icon-wrap" aria-hidden="true">${topicIconSvg(key)}</div>`;
+}
+
 function renderTopicHeroIcon(item, type) {
-  const key = type === 'association' ? associationIconKey(item) : festivalIconKey(item);
-  const tone = type === 'association' ? 'assoc' : 'fest';
-  return `<div class="content-hero-icon content-hero-icon-${tone}" aria-hidden="true">${topicIconSvg(key, 80)}</div>`;
+  const iconKey = type === 'association'
+    ? associationIconKey(item)
+    : type === 'academy'
+      ? academyIconKey(item)
+      : festivalIconKey(item);
+  const tone = type === 'association' ? 'assoc' : type === 'academy' ? 'academy' : 'fest';
+  return `<div class="content-hero-icon content-hero-icon-${tone}" aria-hidden="true">${topicIconSvg(iconKey, 80)}</div>`;
 }
 
 function renderAssociationCard(item, index) {
@@ -359,6 +399,19 @@ function renderFestivalCard(item, index) {
     </a>`;
 }
 
+function renderAcademyCard(item, index) {
+  const { escapeHtml } = U();
+  const cardClass = `academy-card-${(index % 7) + 1}`;
+  const detailUrl = `/academies/${encodeURIComponent(item.slug)}/`;
+
+  return `
+    <a href="${detailUrl}" class="academy-card ${cardClass} fade-up" role="listitem">
+      ${renderAcademyIcon(item)}
+      <div class="academy-title">${escapeHtml(item.title)}</div>
+      <div class="academy-desc">${escapeHtml(item.description)}</div>
+    </a>`;
+}
+
 function renderCoursesGrid(courses, container, options = {}) {
   if (!container) return;
   if (!courses.length) {
@@ -376,7 +429,7 @@ window.SiteComponents = {
   NAV_ITEMS,
   mergeCategories,
   initLayout, bindScrollNav, applySiteLogo, syncSiteTopBar, renderCoursesGrid, renderCourseCard,
-  renderArticleCard, renderArticlesGrid, renderAssociationCard, renderFestivalCard,
-  renderTopicHeroIcon, associationIconKey, festivalIconKey, bindThumbFallbacks,
+  renderArticleCard, renderArticlesGrid, renderAssociationCard, renderFestivalCard, renderAcademyCard,
+  renderTopicHeroIcon, associationIconKey, festivalIconKey, academyIconKey, bindThumbFallbacks,
   courseThumbPlaceholder, articleThumbPlaceholder, courseHeroPlaceholder, articleHeroPlaceholder,
 };

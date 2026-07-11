@@ -1,6 +1,7 @@
 from django.contrib import admin
 
 from apps.content.models import (
+    Academy,
     Article,
     ArticleCategory,
     Association,
@@ -36,6 +37,15 @@ class AssociationAdmin(admin.ModelAdmin):
 
 @admin.register(Festival)
 class FestivalAdmin(admin.ModelAdmin):
+    list_display = ['title', 'slug', 'order', 'is_active']
+    list_filter = ['is_active']
+    search_fields = ['title', 'description', 'content']
+    prepopulated_fields = {'slug': ('title',)}
+    list_editable = ['order', 'is_active']
+
+
+@admin.register(Academy)
+class AcademyAdmin(admin.ModelAdmin):
     list_display = ['title', 'slug', 'order', 'is_active']
     list_filter = ['is_active']
     search_fields = ['title', 'description', 'content']
